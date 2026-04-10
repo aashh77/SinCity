@@ -1,45 +1,73 @@
-@import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;700&family=Syncopate:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@300;400;700&family=Syncopate:wght@700&display=swap');
 
 :root {
     --cyan: #00f3ff; --red: #ff003c; --blue: #0044ff; --dark: #020617; --gold: #ffcc00;
 }
 
 body {
-    background-color: var(--dark);
+    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
     font-family: 'Chivo Mono', monospace;
-    font-size: 16px; color: #cbd5e1;
-    height: 100vh; overflow: hidden; margin: 0;
+    color: #cbd5e1;
 }
 
-/* SIREN OVERLAY */
+/* CRT EFFECTS */
+.scanlines {
+    position: fixed; inset: 0; pointer-events: none; z-index: 5000;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+    background-size: 100% 4px, 3px 100%; opacity: 0.15;
+}
+
 .siren-overlay {
     position: fixed; inset: 0; pointer-events: none; z-index: 1000;
-    animation: police-siren 4s infinite; opacity: 0.04;
+    animation: police-siren 8s infinite; opacity: 0.03;
 }
 @keyframes police-siren {
     0%, 48% { background: var(--red); }
     50%, 98% { background: var(--blue); }
 }
 
-/* UI ELEMENTS */
+/* COMPONENTS */
 .neon-box {
-    background: rgba(15, 23, 42, 0.9);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(0, 243, 255, 0.2);
-    border-radius: 1.2rem;
+    background: rgba(7, 10, 25, 0.7); backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 243, 255, 0.1);
 }
 
-.map-node { fill: #000; stroke: rgba(0, 243, 255, 0.2); stroke-width: 2; cursor: pointer; transition: 0.3s; }
-.map-node.active { stroke: var(--cyan); fill: rgba(0, 243, 255, 0.3); filter: drop-shadow(0 0 10px var(--cyan)); }
-
-.evidence-item {
-    background: rgba(255, 204, 0, 0.1);
-    border: 1px solid rgba(255, 204, 0, 0.3);
-    padding: 10px; border-radius: 8px;
-    cursor: pointer; transition: 0.3s;
-    font-size: 12px; color: var(--gold);
-    display: flex; align-items: center; gap: 10px;
+.neon-box-cyan {
+    background: rgba(7, 10, 25, 0.95); border: 1px solid var(--cyan);
 }
-.evidence-item:hover { background: var(--gold); color: #000; }
 
-#game-log p { margin-bottom: 1rem; border-left: 2px solid rgba(0, 243, 255, 0.1); padding-left: 1rem; }
+/* CHARACTER CARDS */
+.char-card {
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.4) 100%);
+    border: 1px solid rgba(0, 243, 255, 0.1);
+    transition: all 0.3s; cursor: pointer; position: relative;
+}
+.char-card:hover { border-color: var(--cyan); transform: translateX(5px); }
+.char-card.active-target {
+    border-color: var(--cyan); background: rgba(0, 243, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+}
+.char-card.active-target::after {
+    content: "● LIVE"; position: absolute; top: 4px; right: 8px;
+    font-size: 7px; color: var(--cyan); font-weight: 900;
+}
+
+/* EVIDENCE */
+.evidence-tile {
+    background: rgba(255, 204, 0, 0.05); border: 1px solid rgba(255, 204, 0, 0.2);
+    aspect-ratio: 1/1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    padding: 8px; cursor: pointer; transition: 0.3s;
+}
+.evidence-tile:hover {
+    background: var(--gold); color: #000;
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.4); transform: scale(1.05);
+}
+
+/* MAP */
+.map-node { fill: #000; stroke: rgba(0, 243, 255, 0.15); cursor: pointer; transition: 0.4s; }
+.map-node.active { stroke: var(--cyan); fill: rgba(0, 243, 255, 0.1); filter: drop-shadow(0 0 10px var(--cyan)); stroke-width: 3; }
+
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.2); border-radius: 10px; }
