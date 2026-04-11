@@ -27,7 +27,6 @@ body {
     50%, 98% { background: var(--blue); }
 }
 
-/* BRIEFING SCREEN ANIMATION FIX */
 #briefing-screen p {
     white-space: normal !important;
     overflow-y: visible;
@@ -39,7 +38,6 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* DETECTIVE SPEECH INCREASE */
 .detective-speech {
     font-size: 1.1rem !important;
     color: #f1f5f9 !important;
@@ -50,7 +48,6 @@ body {
     letter-spacing: 0.02em;
 }
 
-/* COMPONENTS */
 .neon-box {
     background: rgba(7, 10, 25, 0.7); backdrop-filter: blur(20px);
     border: 1px solid rgba(0, 243, 255, 0.1);
@@ -61,7 +58,6 @@ body {
     box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.05);
 }
 
-/* CHARACTER CARDS */
 .char-card {
     background: linear-gradient(90deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.4) 100%);
     border: 1px solid rgba(0, 243, 255, 0.1);
@@ -72,7 +68,6 @@ body {
     border-color: var(--cyan); background: rgba(0, 243, 255, 0.1);
 }
 
-/* DOSSIER POPUP */
 .bio-popup {
     display: none;
     position: absolute;
@@ -93,3 +88,6 @@ body {
 
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.2); border-radius: 10px; }
+
+.evidence-tile { border: 1px solid rgba(0, 243, 255, 0.1); transition: all 0.2s; }
+.evidence-tile:hover { background: rgba(0, 243, 255, 0.1); border-color: var(--cyan); }

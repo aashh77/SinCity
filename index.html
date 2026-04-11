@@ -63,8 +63,8 @@
         </div>
     </header>
 
-    <main class="flex-grow flex gap-6 min-h-0">
-        <aside class="w-80 neon-box p-4 flex flex-col bg-slate-900/40 border-r-2 border-cyan-500/20 relative z-50" style="overflow: visible !important;">
+    <main class="flex-grow flex gap-6 min-h-0 overflow-hidden">
+        <aside class="w-80 neon-box p-4 flex flex-col bg-slate-900/40 border-r-2 border-cyan-500/20 relative z-50 shrink-0">
             <h2 class="text-[10px] text-cyan-400 font-black mb-4 uppercase tracking-[0.3em] flex items-center gap-2">
                 <span class="animate-pulse">●</span> Active Subjects
             </h2>
@@ -72,7 +72,7 @@
         </aside>
 
         <section class="flex-grow flex flex-col gap-4 min-w-0">
-            <div id="game-log" class="flex-grow bg-slate-950/60 rounded-xl p-6 overflow-y-auto border border-white/5 font-mono text-sm custom-scrollbar relative"></div>
+            <div id="game-log" class="flex-grow bg-slate-950/60 rounded-xl p-6 overflow-y-auto border border-white/5 font-mono text-sm custom-scrollbar relative break-words"></div>
             <div class="neon-box p-1 flex items-center gap-2 shrink-0 border-cyan-900/50 bg-slate-900/40 focus-within:border-cyan-400 transition-all">
                 <span class="pl-4 text-cyan-500 font-bold font-mono">></span>
                 <input type="text" id="player-input" placeholder="TALK TO [NAME] or SEARCH" class="flex-grow bg-transparent p-4 outline-none normal-case text-xs tracking-widest text-white placeholder:text-slate-700">
@@ -80,7 +80,7 @@
             </div>
         </section>
 
-        <aside class="w-80 flex flex-col gap-4 min-h-0">
+        <aside class="w-80 flex flex-col gap-4 min-h-0 shrink-0">
             <div class="neon-box p-4 flex-grow flex flex-col overflow-hidden relative border-cyan-500/30">
                 <h2 class="text-[10px] text-cyan-500/50 font-black mb-4 uppercase tracking-[0.2em]">Tactical Overlay</h2>
                 <div class="flex-grow bg-cyan-950/10 rounded-lg border border-cyan-500/10 relative overflow-hidden group">
@@ -93,18 +93,44 @@
                 <h2 class="text-[10px] text-yellow-500 font-black mb-3 uppercase tracking-[0.3em] flex justify-between">
                     Evidence Locker <span>[SECURE]</span>
                 </h2>
+                <button onclick="UI.toggleDatabase()" class="mb-2 w-full py-1.5 border border-cyan-500/30 bg-cyan-500/5 text-[8px] text-cyan-400 hover:bg-cyan-500 hover:text-black transition-all font-black tracking-widest uppercase flex items-center justify-center gap-2">
+                    <span class="animate-pulse">📡</span> Access Criminal Database
+                </button>
                 <div id="evidence-list" class="grid grid-cols-3 gap-2 overflow-y-auto custom-scrollbar"></div>
             </div>
         </aside>
     </main>
 
     <div id="accuse-modal" class="hidden fixed inset-0 z-[3000] bg-slate-950/90 flex items-center justify-center p-6 backdrop-blur-md">
-        <div class="neon-box max-w-md w-full p-8 border-red-600 border-2 shadow-[0_0_50px_rgba(220,38,38,0.2)]">
-            <h2 class="font-['Syncopate'] text-red-500 text-xl mb-6 tracking-widest text-center">LEGAL_AUTHORIZATION</h2>
+        <div class="neon-box max-w-lg w-full p-8 border-red-600 border-2 shadow-[0_0_50px_rgba(220,38,38,0.2)]">
+            <h2 class="font-['Syncopate'] text-red-500 text-xl mb-4 tracking-widest text-center">LEGAL_AUTHORIZATION</h2>
+            
+            <label class="block text-[8px] text-red-900 font-black mb-2 uppercase">Target Subject</label>
             <select id="arrest-select" class="w-full bg-slate-900 border border-red-900/50 p-4 text-white mb-6 rounded outline-none appearance-none hover:border-red-500 transition-all uppercase font-mono text-xs text-center"></select>
+            
+            <label class="block text-[8px] text-red-900 font-black mb-2 uppercase mt-4">Official Theory (Who, How, Why)</label>
+            <textarea id="theory-input" placeholder="Explain the killer's true identity, the motive, and how the victims died..." class="w-full h-32 bg-slate-900 border border-red-900/50 p-4 text-white mb-6 rounded outline-none text-xs font-mono custom-scrollbar focus:border-red-500 placeholder:text-red-900/50"></textarea>
+
             <div class="flex gap-4">
                 <button onclick="UI.toggleAccusation()" class="flex-grow py-4 border border-slate-700 text-slate-500 font-bold uppercase text-[10px] hover:bg-slate-800">Cancel</button>
                 <button onclick="GameState.submitFinalTheory()" class="flex-grow py-4 bg-red-600 text-white font-black uppercase text-[10px] tracking-widest hover:bg-red-400">Authorize Arrest</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="database-modal" class="hidden fixed inset-0 z-[4000] bg-slate-950/95 flex items-center justify-center p-6 backdrop-blur-xl">
+        <div class="neon-box max-w-lg w-full p-8 border-cyan-500 border-2 shadow-[0_0_50px_rgba(0,243,255,0.1)]">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-['Syncopate'] text-cyan-400 text-sm tracking-[0.3em]">SINCITY_DATABASE</h2>
+                <button onclick="UI.toggleDatabase()" class="text-cyan-800 hover:text-red-500 font-mono text-xs">[CLOSE]</button>
+            </div>
+            <p class="text-[9px] text-cyan-700 mb-4 font-mono uppercase tracking-widest">>> ENTER SUBJECT NAME OR LOCATION FOR DEEP-SCAN</p>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="db-query-input" placeholder="SEARCH: OAKHAVEN, SARAH, ELIAS..." class="flex-grow bg-slate-900 border border-cyan-900 p-3 text-cyan-400 text-xs outline-none focus:border-cyan-400 transition-all font-mono">
+                <button onclick="GameState.queryDatabase()" class="px-6 bg-cyan-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-cyan-400 hover:text-black">SEARCH</button>
+            </div>
+            <div id="db-results" class="h-48 overflow-y-auto custom-scrollbar bg-black/40 p-4 border border-cyan-900/30 font-mono text-[10px] leading-relaxed text-cyan-100/60 italic">
+                Waiting for terminal input...
             </div>
         </div>
     </div>

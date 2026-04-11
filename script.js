@@ -29,6 +29,7 @@ const GameState = {
         this.renderMap();
         this.updateUI();
         document.getElementById('player-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') this.handleInput(); });
+        document.getElementById('db-query-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') this.queryDatabase(); });
         setInterval(() => this.recoveryHeartbeat(), 20000);
     },
 
@@ -65,7 +66,6 @@ const GameState = {
         p.val--;
         this.updateTime(5); 
 
-        // DETECTIVE SPEECH LOGGING (LARGER TEXT)
         UI.log(`${this.playerName.toUpperCase()}: "${message}"`, "detective-speech font-bold italic");
 
         if (name === "VIP-Deaf" && message !== message.toUpperCase()) {
@@ -144,8 +144,36 @@ const GameState = {
     },
 
     askCurrentTarget(clue) {
-        if (!this.currentTarget) return UI.log("SELECT A SUBJECT FIRST.", "text-red-400");
+        if (!this.currentTarget) {
+            if (clue === "Oakhaven Diary") {
+                UI.log("--- SCANNING SARAH'S DIARY ---", "text-yellow-500 font-black");
+                UI.log("A hidden entry reads: 'I thought I left Oakhaven behind. I thought the testimony bought my freedom. But lately, I feel a pair of eyes on me—cold, clinical eyes. Like he's back.'", "text-yellow-200 border-l border-yellow-500 pl-4 py-2 italic bg-yellow-950/20 block w-full");
+            } else {
+                UI.log("SELECT A SUBJECT TO SHOW THIS EVIDENCE.", "text-cyan-600");
+            }
+            return;
+        }
         this.aiTalk(this.currentTarget, `Explain this: ${clue}`);
+    },
+
+    queryDatabase() {
+        const input = document.getElementById('db-query-input');
+        const results = document.getElementById('db-results');
+        const query = input.value.toUpperCase();
+        if (!query) return;
+
+        this.updateTime(10);
+        results.innerHTML = `<p class="text-cyan-400 animate-pulse">> ACCESSING SINCITY_PD CENTRAL SERVERS...</p>`;
+        
+        setTimeout(() => {
+            if (query.includes("OAKHAVEN") || query.includes("SARAH")) {
+                results.innerHTML = `<p class="text-cyan-100"><span class="text-cyan-400">[FILE FOUND]</span> Case #442-B. Victim B (Sarah) provided testimony against the Oakhaven narcotics ring 5 years ago. Primary target 'The Chemist' incarcerated. Mother of target deceased during sentencing.</p>`;
+            } else if (query.includes("ELIAS") || query.includes("CHEMIST") || query.includes("JULIAN")) {
+                results.innerHTML = `<p class="text-red-400"><span class="text-red-500">[ENCRYPTED]</span> Elias 'The Chemist' Thorne. Master of neurotoxins. Released 2 weeks ago. NOTE: Underwent facial reconstruction post-release. Current identity unknown.</p>`;
+            } else {
+                results.innerHTML = `<p class="text-slate-500">>> NO DIRECT MATCHES. TRY: OAKHAVEN, SARAH, ELIAS.</p>`;
+            }
+        }, 800);
     },
 
     renderMap() {
@@ -176,8 +204,22 @@ const GameState = {
     },
 
     submitFinalTheory() {
-        if (document.getElementById('arrest-select').value === "PA-Julian") alert("WIN: ELIAS APPREHENDED.");
-        else alert("FAILURE: WRONG ARREST.");
+        const suspect = document.getElementById('arrest-select').value;
+        const theory = document.getElementById('theory-input').value.toLowerCase();
+        
+        const hasIdentity = theory.includes("elias");
+        const hasMotive = theory.includes("oakhaven") || theory.includes("revenge") || theory.includes("testified");
+        const hasWeapon = theory.includes("poison") || theory.includes("toxin") || theory.includes("needle");
+
+        if (suspect === "PA-Julian") {
+            if (hasIdentity && hasMotive && hasWeapon) {
+                alert("CASE CLOSED: You exposed Julian as Elias. He was arrested for the Oakhaven revenge plot. Sarah's death is confirmed as homicide by toxin. EXCELLENT WORK.");
+            } else {
+                alert("INSUFFICIENT THEORY: You arrested the right person, but your theory lacked the Oakhaven connection or weapon details. He might beat the charge.");
+            }
+        } else {
+            alert(`FAILURE: You arrested ${suspect}. The real killer, Julian (Elias), vanished into the night.`);
+        }
         location.reload();
     }
 };
@@ -215,7 +257,8 @@ const UI = {
             await new Promise(r => setTimeout(r, 10));
         }
     },
-    toggleAccusation() { document.getElementById('accuse-modal').classList.toggle('hidden'); }
+    toggleAccusation() { document.getElementById('accuse-modal').classList.toggle('hidden'); },
+    toggleDatabase() { document.getElementById('database-modal').classList.toggle('hidden'); }
 };
 
 window.UI = UI; window.GameState = GameState;
