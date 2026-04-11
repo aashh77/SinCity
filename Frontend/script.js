@@ -56,32 +56,25 @@ const GameState = {
         UI.log(`INTERROGATING ${name.toUpperCase()}`, "text-cyan-400 text-[10px] tracking-widest");
     },
 
-    async aiTalk(name, message) {
-        const msg = message.toLowerCase();
-        let response = "I have nothing to say about that.";
-        const p = this.patience[name];
+   async aiTalk(name, message) {
+    UI.log(`${this.playerName.toUpperCase()}: "${message}"`, "detective-speech font-bold italic");
 
-        if (p.val <= 0) return UI.log(`${name.toUpperCase()} IS TIRED OF YOUR QUESTIONS.`, "text-red-500 font-black");
+    try {
+        const response = await fetch('http://localhost:5000/api/interrogate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, message })
+        });
         
-        p.val--;
-        this.updateTime(5); 
-
-        UI.log(`${this.playerName.toUpperCase()}: "${message}"`, "detective-speech font-bold italic");
-
-        if (name === "VIP-Deaf" && message !== message.toUpperCase()) {
-            response = "WHAT?! SPEAK UP! I CAN'T HEAR YOU!";
-        } else if (msg.includes("affair") || msg.includes("closet") || msg.includes("guard") || msg.includes("elena")) {
-            if (["Elena", "Guard", "VIP-Arrogant"].includes(name)) response = p.secret;
-        } else if (msg.includes("elias") || msg.includes("oakhaven") || msg.includes("diary") || msg.includes("julian")) {
-            if (name === "PA-Julian") { p.val = 0; response = p.secret; }
-            else if (name === "VIP-Deaf") response = "OAKHAVEN? THE ASSISTANT JULIAN IS FROM THERE!";
-        }
-
-        if (response === p.secret && !p.suspicion.includes(response)) p.suspicion.push(response);
-
+        const data = await response.json();
+        
         this.updateUI();
-        await UI.typeLog(`${name}: "${response}"`, "text-white font-bold border-l-2 border-cyan-500 pl-4 bg-cyan-950/20 py-2 rounded-r");
-    },
+        await UI.typeLog(`${name}: "${data.response}"`, "text-white font-bold border-l-2 border-cyan-500 pl-4 bg-cyan-950/20 py-2 rounded-r");
+    } catch (err) {
+        console.error("Connection to server failed:", err);
+        UI.log("SERVER CONNECTION ERROR. REBOOT TERMINAL.", "text-red-500");
+    }
+},
 
     handleSearch() {
         const clue = this.locations[this.currentLoc].clue;
