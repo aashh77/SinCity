@@ -71,3 +71,36 @@ body {
 
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.2); border-radius: 10px; }
+
+/* --- THE ULTIMATE POPUP FIX --- */
+.bio-popup {
+    display: none;
+    position: absolute; /* Switched back to absolute to scroll with the name */
+    left: 100%;        /* Sticks to the right edge of the card */
+    top: 0;
+    margin-left: 20px;
+    width: 260px;
+    background: rgba(2, 6, 23, 0.98);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--cyan);
+    padding: 18px;
+    z-index: 9999;     /* Ensure it sits on top of the chat log */
+    pointer-events: none;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 1);
+}
+
+/* Force the character panel and sidebar to let the popup out */
+#character-panel, aside {
+    overflow: visible !important;
+}
+
+/* Show the popup on hover */
+.char-card:hover .bio-popup {
+    display: block;
+    animation: dossierSlide 0.2s ease-out;
+}
+
+@keyframes dossierSlide {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}

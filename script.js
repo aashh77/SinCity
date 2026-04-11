@@ -6,15 +6,60 @@ const GameState = {
     currentTarget: null,
 
     patience: { 
-        "Elena": { val: 10, max: 10, icon: "🧹", secret: "I wasn't in the room! The Guard and I were... occupied in the closet." },
-        "Manager": { val: 5, max: 5, icon: "💼", secret: "I hate VIPs, but I'm no killer." },
-        "Guard": { val: 8, max: 8, icon: "🛡️", secret: "The logs are fake. I was with Elena." },
-        "VIP-Arrogant": { val: 4, max: 4, icon: "💎", secret: "I was having a 'private meeting' with the Guard. Don't tell my wife." },
-        "VIP-Stammer": { val: 6, max: 6, icon: "😰", secret: "I-I-I saw Julian hide a needle!" },
-        "VIP-Deaf": { val: 10, max: 10, icon: "🧏", secret: "WHAT? SYRINGE? I KNEW THAT PA WAS A FREAK!" },
-        "PA-Julian": { val: 5, max: 5, icon: "🧪", secret: "Elias is dead, Detective. I am someone else now." },
-        "PA-Viktor": { val: 6, max: 6, icon: "👔", secret: "Julian is too calm. Cold as ice." },
-        "PA-Jax": { val: 5, max: 5, icon: "🧥", secret: "I saw someone by the service lift." }
+        "Elena": { 
+            val: 10, max: 10, icon: "🧹", 
+            bio: "Casino maid. Knows the service vents and staff schedules better than the architect.",
+            suspicion: [], 
+            secret: "I wasn't in the room! The Guard and I were... occupied in the closet." 
+        },
+        "Manager": { 
+            val: 5, max: 5, icon: "💼", 
+            bio: "Oversees floor operations. Deeply in debt to the House, making him desperate for a clean-up.",
+            suspicion: [], 
+            secret: "I hate VIPs, but I'm no killer. I just look the other way for a price." 
+        },
+        "Guard": { 
+            val: 8, max: 8, icon: "🛡️", 
+            bio: "Former military. Recently disciplined for missing a shift during a high-stakes heist.",
+            suspicion: [], 
+            secret: "The logs are fake. I was with Elena. Check the service lift cameras if you don't believe me." 
+        },
+        "VIP-Arrogant": { 
+            val: 4, max: 4, icon: "💎", 
+            bio: "Old money, new vices. Thinks everyone in this casino is beneath his custom-tailored boots.",
+            suspicion: [], 
+            secret: "I was having a 'private meeting' with the Guard. Don't tell my wife; she controls the trust fund." 
+        },
+        "VIP-Stammer": { 
+            val: 6, max: 6, icon: "😰", 
+            bio: "A regular at the baccarat tables. Looks like he hasn't slept since the victim arrived.",
+            suspicion: [], 
+            secret: "I-I-I saw Julian hide a needle! He looked... possessed! Like he was finishing a ritual." 
+        },
+        "VIP-Deaf": { 
+            val: 10, max: 10, icon: "🧏", 
+            bio: "A retired judge. Hard of hearing, but has the sharpest eyes in the lounge.",
+            suspicion: [], 
+            secret: "WHAT? SYRINGE? I KNEW THAT PA WAS A FREAK! I saw him leaving the Chemist's room!" 
+        },
+        "PA-Julian": { 
+            val: 5, max: 5, icon: "🧪", 
+            bio: "The victim's personal assistant. Expert in high-end pharmaceuticals and synthetic toxins.",
+            suspicion: [], 
+            secret: "Elias is dead, Detective. I am someone else now. This city changes people." 
+        },
+        "PA-Viktor": { 
+            val: 6, max: 6, icon: "👔", 
+            bio: "Junior assistant to the victim. Loyal to a fault, or perhaps just terrified.",
+            suspicion: [], 
+            secret: "Julian is too calm. Cold as ice. He didn't even flinch when the body was found." 
+        },
+        "PA-Jax": { 
+            val: 5, max: 5, icon: "🧥", 
+            bio: "The security-minded assistant. Always carries a pocket knife and a hidden recorder.",
+            suspicion: [], 
+            secret: "I saw someone by the service lift around 2 AM. Tall, wearing a lab coat. Julian's coat." 
+        }
     },
 
     locations: {
@@ -72,7 +117,7 @@ const GameState = {
     },
 
     async aiTalk(name, message) {
-        const msg = message.toUpperCase();
+        const msg = message.toLowerCase(); // Use lowercase for keywords
         let response = "I have nothing to say about that, Detective.";
         const p = this.patience[name];
 
@@ -80,44 +125,38 @@ const GameState = {
         
         p.val--;
         this.updateTime(5); 
-
         UI.log(`${this.playerName.toUpperCase()}: "${message}"`, "text-slate-500 italic text-[10px]");
 
         // --- DYNAMIC RESPONSE LOGIC ---
         
-        // 1. Special Case: VIP-Deaf
         if (name === "VIP-Deaf" && message !== message.toUpperCase()) {
             response = "WHAT?! SPEAK UP! I CAN'T HEAR YOU!";
         } 
         
-        // 2. Alibi Logic: Elena & Guard (The Affair)
-        else if (msg.includes("AFFAIR") || msg.includes("CLOSET") || msg.includes("GUARD") || msg.includes("ELENA") || msg.includes("WITH")) {
-            if (name === "Elena" || name === "Guard" || name === "VIP-Arrogant") response = p.secret;
+        // 1. Alibi Logic (Elena, Guard, Arrogant)
+        else if (msg.includes("affair") || msg.includes("closet") || msg.includes("guard") || msg.includes("elena")) {
+            if (name === "Elena" || name === "Guard" || name === "VIP-Arrogant") {
+                response = p.secret; // <--- This pulls the EXACT string from your data
+            }
         }
 
-        // 3. The Killer's Identity: Julian / Elias / Oakhaven
-        else if (msg.includes("ELIAS") || msg.includes("OAKHAVEN") || msg.includes("DIARY") || msg.includes("JULIAN")) {
+        // 2. The Killer's Identity (Julian / Elias / Oakhaven)
+        else if (msg.includes("elias") || msg.includes("oakhaven") || msg.includes("diary") || msg.includes("julian")) {
             if (name === "PA-Julian") { 
-                p.val = 0; // He shuts down completely
-                response = "You shouldn't have dug that up. Elias is a dead man. We're done."; 
+                p.val = 0; 
+                response = p.secret; // <--- Pulls EXACT string for Julian
             }
             else if (name === "VIP-Deaf") response = "OAKHAVEN? THE ASSISTANT JULIAN IS FROM THERE!";
-            else if (name === "PA-Viktor") response = "Julian? He's too calm. Cold as ice, that one.";
-            else response = "Oakhaven? Sounds like a retirement home. Never heard of it.";
+            else response = "I don't know anything about that.";
         }
 
-        // 4. Evidence Logic: Needle / Syringe / Meds
-        else if (msg.includes("NEEDLE") || msg.includes("SYRINGE") || msg.includes("MARK") || msg.includes("MEDS")) {
-            if (name === "VIP-Stammer") response = p.secret;
-            else response = "A needle mark? Maybe the victim was on medication.";
+        // --- THE "CATCHER" ---
+        // Now that response IS p.secret, this comparison will finally work!
+        if (response === p.secret && !p.suspicion.includes(response)) {
+            p.suspicion.push(response);
         }
 
-        // 5. General Evidence: Knife / Report
-        else if (msg.includes("KNIFE")) {
-            response = "A pocket knife? In Sin City, that's practically a fashion accessory.";
-        }
-
-        this.updateUI();
+        this.updateUI(); // Refreshes the Dossier Popup immediately
         await UI.typeLog(`${name}: "${response}"`, "text-white font-bold border-l-2 border-cyan-500 pl-4 bg-cyan-950/20 py-2 rounded-r");
     },
 
@@ -149,19 +188,37 @@ const GameState = {
 
     updateUI() {
         const panel = document.getElementById('character-panel');
-        panel.innerHTML = this.locations[this.currentLoc].chars.map(c => `
-            <div onclick="GameState.selectTarget('${c}')" class="char-card p-3 rounded-lg ${this.currentTarget === c ? 'active-target' : ''}">
-                <div class="flex items-center gap-3">
-                    <span class="text-xl">${this.patience[c].icon}</span>
-                    <div class="flex-grow">
-                        <p class="text-white text-[10px] font-black uppercase tracking-widest">${c}</p>
-                        <div class="flex gap-0.5 mt-1">${Array.from({length: this.patience[c].max}).map((_, i) => `
-                            <div class="w-full h-1 ${i < this.patience[c].val ? 'bg-cyan-400 shadow-[0_0_5px_#00f3ff]' : 'bg-slate-800'}"></div>`).join('')}
+        panel.innerHTML = this.locations[this.currentLoc].chars.map(c => {
+            const char = this.patience[c];
+            
+            // Generate the list of suspicious quotes for the popup
+            const suspicionList = char.suspicion.length > 0 
+                ? char.suspicion.map(q => `<li class="mb-2 border-l-2 border-red-600 pl-2 text-white">"${q}"</li>`).join('') 
+                : `<li class="text-slate-500 italic">No incriminating statements recorded.</li>`;
+
+            return `
+                <div onclick="GameState.selectTarget('${c}')" class="char-card p-3 rounded-lg relative group ${this.currentTarget === c ? 'active-target' : ''}">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">${char.icon}</span>
+                        <div class="flex-grow">
+                            <p class="text-white text-[10px] font-black uppercase tracking-widest">${c}</p>
+                            <div class="flex gap-0.5 mt-1">${Array.from({length: char.max}).map((_, i) => `
+                                <div class="w-full h-1 ${i < char.val ? 'bg-cyan-400 shadow-[0_0_5px_#00f3ff]' : 'bg-slate-800'}"></div>`).join('')}
+                            </div>
                         </div>
                     </div>
+
+                    <div class="bio-popup">
+                        <p class="text-cyan-400 font-black text-[8px] tracking-[0.3em] mb-2 border-b border-cyan-900 pb-1">SUBJECT_DOSSIER // ${c.toUpperCase()}</p>
+                        <p class="text-slate-400 text-[9px] leading-relaxed mb-4">${char.bio}</p>
+                        <p class="text-red-500 font-black text-[7px] tracking-widest mb-2 uppercase">Suspicious Activity:</p>
+                        <ul class="list-none text-[9px] space-y-1">
+                            ${suspicionList}
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         const ev = document.getElementById('evidence-list');
         ev.innerHTML = this.inventory.map(i => `

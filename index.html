@@ -43,7 +43,7 @@
     </header>
 
     <main class="flex-grow flex gap-6 min-h-0">
-        <aside class="w-80 neon-box p-4 flex flex-col min-h-0 bg-slate-900/40 border-r-2 border-cyan-500/20">
+        <aside class="w-80 neon-box p-4 flex flex-col bg-slate-900/40 border-r-2 border-cyan-500/20 relative z-50" style="overflow: visible !important;">
             <h2 class="text-[10px] text-cyan-400 font-black mb-4 uppercase tracking-[0.3em] flex items-center gap-2">
                 <span class="animate-pulse">●</span> Active Subjects
             </h2>
@@ -54,7 +54,7 @@
             <div id="game-log" class="flex-grow bg-slate-950/60 rounded-xl p-6 overflow-y-auto border border-white/5 font-mono text-sm custom-scrollbar relative"></div>
             <div class="neon-box p-1 flex items-center gap-2 shrink-0 border-cyan-900/50 bg-slate-900/40 focus-within:border-cyan-400 transition-all">
                 <span class="pl-4 text-cyan-500 font-bold font-mono">></span>
-                <input type="text" id="player-input" placeholder="TALK TO [NAME] or SEARCH" class="flex-grow bg-transparent p-4 outline-none uppercase text-xs tracking-widest text-white placeholder:text-slate-700">
+                <input type="text" id="player-input" placeholder="TALK TO [NAME] or SEARCH" class="flex-grow bg-transparent p-4 outline-none normal-case text-xs tracking-widest text-white placeholder:text-slate-700">
                 <button onclick="GameState.handleInput()" class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/50 px-8 py-3 rounded-lg font-black uppercase text-[10px] hover:bg-cyan-500 hover:text-black transition-all mr-1">Execute</button>
             </div>
         </section>
