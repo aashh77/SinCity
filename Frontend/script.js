@@ -79,20 +79,45 @@ startClock() {
     }, 1000); 
 },
 
-gameOver(reason) {
-    // Stop the actual interval using the ID we stored
-    if (this.gameClockInterval) {
-        clearInterval(this.gameClockInterval);
-    }
-    
-    const input = document.getElementById('player-input');
-    if (input) {
-        input.disabled = true;
-        input.placeholder = "CASE TERMINATED.";
-    }
+// REPLACE this in GameState object in script.js
+gameOver(type, narrative) {
+    // 1. Core logical shutdown
+    if (this.gameClockInterval) clearInterval(this.gameClockInterval);
+    document.getElementById('player-input').disabled = true;
 
-    document.body.style.filter = "grayscale(100%) brightness(50%)";
-    UI.typeLog(`SYSTEM STATUS: ${reason}`, "text-white font-bold text-center text-xl block mt-10");
+    // 2. Map visual data based on ending type
+    const endData = {
+        WIN: {
+            header: "CASE_CLOSED",
+            headerClass: "text-green-500 shadow-[0_0_30px_#00ff00] font-black",
+            image: "https://images.unsplash.com/photo-1598048145802-58e1b1d44093?q=80&w=600" // A high-contrast handcuffs shot
+        },
+        LOSS: {
+            header: "STATUS_TERMINATED",
+            headerClass: "text-red-600 shadow-[0_0_30px_#ff0000] font-black",
+            image: "https://images.unsplash.com/photo-1579783901586-d88db74b4fe1?q=80&w=600" // A cinematic "escaping into the rain" shot
+        }
+    };
+
+    const data = endData[type] || endData.LOSS; // Default to Loss if type is weird
+
+    // 3. Populate and show the End Screen
+    const screen = document.getElementById('end-screen');
+    const header = document.getElementById('end-status-header');
+    const img = document.getElementById('end-image');
+    const aiFeedback = document.getElementById('end-ai-feedback');
+
+    if (screen && header && img && aiFeedback) {
+        header.innerText = data.header;
+        header.className = data.headerClass; // Applies neon red or green
+        img.src = data.image;
+        screen.classList.remove('hidden'); // Show the modal
+
+        // Using a slight delay to trigger the fade-in effect properly
+        setTimeout(() => {
+            UI.typeLogNarrative("end-ai-feedback", narrative); // Unique typeLog for the end screen
+        }, 1500);
+    }
 },
 
     // --- CRIMINAL DATABASE LOGIC ---
@@ -124,6 +149,7 @@ gameOver(reason) {
 
     // --- WARRANT SYSTEM LOGIC ---
     // --- AI-POWERED WARRANT CHECK ---
+// REPLACE this in GameState object in script.js
 async submitFinalTheory() {
     const target = document.getElementById('arrest-select').value;
     const theory = document.getElementById('theory-input').value;
@@ -133,7 +159,6 @@ async submitFinalTheory() {
         return;
     }
 
-    // Close modal and show loading
     UI.toggleAccusation();
     UI.log(`TRANSMITTING WARRANT FOR ${target.toUpperCase()} TO HIGH-COMMAND...`, "text-yellow-500 blink");
 
@@ -146,16 +171,11 @@ async submitFinalTheory() {
 
         const result = await response.json();
 
-        // Reveal the result with a typing effect
+        // 4. Pass results to gameOver, rather than a text log
         if (result.success) {
-            await UI.typeLog(`[SUCCESS] ${result.feedback}`, "text-green-400 font-black border-2 border-green-500 p-4 bg-green-950/40 mt-4");
-            // End game
-            this.gameOver("CASE CLOSED. JUSTICE SERVED.");
+            this.gameOver("WIN", result.feedback); // Calls victory cinematic
         } else {
-            await UI.typeLog(`[FAILURE] ${result.feedback}`, "text-red-500 font-black border-2 border-red-500 p-4 bg-red-950/40 mt-4");
-            // Optionally: deduct massive time for a wrong warrant
-            this.time -= 300; 
-            UI.log("-300 MINUTES: BUREAUCRATIC PENALTY FOR WRONGFUL ACCUSATION.", "text-red-800");
+            this.gameOver("LOSS", result.feedback); // Calls failure cinematic
         }
 
     } catch (err) {
@@ -203,40 +223,63 @@ async submitFinalTheory() {
     },
 
     async aiTalk(name, message) {
-        UI.log(`YOU: "${message}"`, "italic text-slate-400 font-bold");
+    UI.log(`YOU: "${message}"`, "italic text-slate-400 font-bold");
+    
+    const subject = this.patience[name];
+
+    // --- NEW SECURITY TRIGGER ---
+    if (subject && subject.val <= 0) {
+        this.triggerSecurityIncident(name);
+        return;
+    }
+
+    const thinkingId = `think-${Date.now()}`;
+    UI.log(`${name.toUpperCase()} IS RESPONDING...`, "text-cyan-900 animate-pulse text-[8px] tracking-[0.2em]", thinkingId);
+
+    try {
+        const response = await fetch('http://localhost:5000/api/interrogate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, message })
+        });
+        const data = await response.json();
         
-        const subject = this.patience[name];
-        if (subject && subject.val <= 0) {
-            await UI.typeLog(`${name}: "I've said enough. Talk to my lawyer."`, "text-red-500 font-bold");
-            return;
+        document.getElementById(thinkingId)?.remove();
+
+        // Reduce patience
+        if (this.patience[name] && this.patience[name].val > 0) {
+            this.patience[name].val -= 1;
         }
 
-        const thinkingId = `think-${Date.now()}`;
-        UI.log(`${name.toUpperCase()} IS RESPONDING...`, "text-cyan-900 animate-pulse text-[8px] tracking-[0.2em]", thinkingId);
-
-        try {
-            const response = await fetch('http://localhost:5000/api/interrogate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, message })
-            });
-            const data = await response.json();
-            
-            const thinkNode = document.getElementById(thinkingId);
-            if (thinkNode) thinkNode.remove();
-
-            if (this.patience[name] && this.patience[name].val > 0) {
-                this.patience[name].val -= 1;
-            }
-
-            await UI.typeLog(`${name.toUpperCase()}: "${data.response}"`, "text-white border-l-2 border-cyan-500 pl-4 bg-cyan-950/20 py-3 my-2");
-            this.updateUI();
-        } catch (err) {
-            const thinkNode = document.getElementById(thinkingId);
-            if (thinkNode) thinkNode.remove();
-            UI.log("SIGNAL LOST: NEURAL LINK FAILED", "text-red-500 font-black border border-red-500 p-1");
+        await UI.typeLog(`${name.toUpperCase()}: "${data.response}"`, "text-white border-l-2 border-cyan-500 pl-4 bg-cyan-950/20 py-3 my-2");
+        
+        // If that was their last bit of patience, warn the player
+        if (this.patience[name].val === 0) {
+            UI.log(`WARNING: ${name.toUpperCase()} IS REACHING THEIR LIMIT.`, "text-red-500 blink font-black");
         }
-    },
+
+        this.updateUI();
+    } catch (err) {
+        document.getElementById(thinkingId)?.remove();
+        UI.log("SIGNAL LOST: NEURAL LINK FAILED", "text-red-500 font-black border border-red-500 p-1");
+    }
+},
+triggerSecurityIncident(name) {
+    const penalty = 120; // 2 hours lost
+    this.time -= penalty;
+    
+    // Visual Flash
+    document.body.classList.add('bg-red-900');
+    setTimeout(() => document.body.classList.remove('bg-red-900'), 500);
+
+    UI.typeLog(`[SECURITY ALERT] ${name.toUpperCase()} has summoned House Security.`, "text-red-500 font-black text-lg");
+    UI.log(`PENALTY: -${penalty} MINUTES spent negotiating with the Floor Manager.`, "text-red-800 font-bold bg-white px-2");
+    
+    // Reset their patience slightly so you can talk again later, but at a cost
+    this.patience[name].val = 2; 
+    
+    this.updateUI();
+},
 
     askCurrentTarget(clue) {
     if (!this.currentTarget) {
@@ -380,6 +423,19 @@ const UI = {
             await new Promise(r => setTimeout(r, 12));
         }
     },
+    // Inside UI object in script.js
+async typeLogNarrative(elementId, message) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    element.innerHTML = ""; // Clear STANDBY message
+
+    for (let i = 0; i < message.length; i++) {
+        element.innerHTML += message[i];
+        // Ensure the terminal scrolls as we type
+        document.getElementById('end-feedback-terminal').scrollTop = document.getElementById('end-feedback-terminal').scrollHeight;
+        await new Promise(r => setTimeout(r, 15)); // Narrative speed is slightly slower
+    }
+},
 
     toggleAccusation() {
         const modal = document.getElementById('accuse-modal');

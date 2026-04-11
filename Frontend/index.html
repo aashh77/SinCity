@@ -183,5 +183,35 @@
     <script type="module">
    // window.handleGameStart logic...
 </script>
+<div id="end-screen" class="hidden fixed inset-0 z-[5000] bg-black/95 flex items-center justify-center p-6 backdrop-blur-sm transition-opacity duration-1000">
+    <div class="max-w-4xl w-full neon-box-cyan p-12 relative overflow-y-auto max-h-[95vh] flex flex-col items-center">
+        <div class="end-screen-glitch"></div>
+        
+        <div class="absolute top-0 left-0 w-full h-1 bg-cyan-500 shadow-[0_0_15px_#00f3ff]"></div>
+
+        <h1 id="end-status-header" class="font-['Syncopate'] text-6xl text-center mb-8 tracking-[0.2em] font-black uppercase text-red-600 shadow-[0_0_30px_#ff0000]">
+            STATUS_TERMINATED
+        </h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-10">
+            <img id="end-image" src="" alt="CASE RESOLUTION" class="w-full h-80 object-cover border-4 border-cyan-700 shadow-[0_0_20px_#00c3ff44]">
+            
+            <div id="end-feedback-terminal" class="bg-black/80 border border-cyan-900 p-6 font-mono text-sm leading-relaxed text-cyan-200 h-80 overflow-y-auto custom-scrollbar">
+                > ESTABLISHING SECURE CONNECTION TO HIGH-COMMAND...<br>
+                > DEBRIEFING INITIATED...<br>
+                > ...<br>
+                <span id="end-ai-feedback" class="text-white mt-4 block"></span>
+            </div>
+        </div>
+
+        <button onclick="location.reload()" class="w-full py-6 bg-cyan-600 text-white font-black uppercase tracking-[0.4em] hover:bg-cyan-400 hover:text-black transition-all shadow-lg border-2 border-cyan-400 group">
+            <span class="animate-pulse">●</span> REINITIALIZE UNIT / PLAY AGAIN
+        </button>
+        
+        <p class="text-[8px] text-cyan-700 text-center uppercase mt-6 tracking-widest">
+            SINCITY NEURAL NETWORK // SESSION TERMINATED // NO RETURN
+        </p>
+    </div>
+</div>
 </body>
 </html>
