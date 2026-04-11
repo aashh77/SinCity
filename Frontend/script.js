@@ -253,5 +253,22 @@ const UI = {
     toggleAccusation() { document.getElementById('accuse-modal').classList.toggle('hidden'); },
     toggleDatabase() { document.getElementById('database-modal').classList.toggle('hidden'); }
 };
+// This function is triggered by your Login Button
+async function handleGameStart() {
+    const user = await window.loginWithGoogle();
+    if (user) {
+        // Update the UI with the detective's name
+        document.getElementById('display-name').innerText = `Det. ${user.displayName}`;
+        
+        // Hide the briefing screen
+        document.getElementById('briefing-screen').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('briefing-screen').classList.add('hidden');
+        }, 500);
+
+        // Call your existing game start logic
+        UI.startInvestigation(); 
+    }
+}
 
 window.UI = UI; window.GameState = GameState;
