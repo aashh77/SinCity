@@ -114,43 +114,68 @@
             </div>
         </div>
     </div>
+    <div id="database-modal" class="hidden fixed inset-0 z-[3000] bg-slate-950/90 flex items-center justify-center p-6 backdrop-blur-md">
+    <div class="neon-box max-w-2xl w-full p-8 border-cyan-500 border-2">
+        <h2 class="font-['Syncopate'] text-cyan-400 text-xl mb-4 tracking-widest text-center">CRIMINAL_DATABASE</h2>
+        <input type="text" id="db-query-input" placeholder="SEARCH RECORDS (e.g., OAKHAVEN, ELIAS)" class="w-full bg-slate-900 border border-cyan-900/50 p-4 text-white mb-6 rounded outline-none font-mono text-xs">
+        <div id="db-results" class="h-64 overflow-y-auto font-mono text-xs text-cyan-100 p-4 bg-black/40 rounded border border-cyan-900/30">
+            > STANDBY...
+        </div>
+        <button onclick="UI.toggleDatabase()" class="mt-6 w-full py-4 border border-cyan-700 text-cyan-500 font-bold uppercase text-[10px] hover:bg-cyan-800">Close Terminal</button>
+    </div>
+    <div class="flex gap-0.5 mt-1">
+    ${Array.from({length: char.max}).map((_, i) => `
+        <div class="w-2 h-1 ${i < char.val ? 'bg-cyan-400 shadow-[0_0_5px_#00f3ff]' : 'bg-slate-800'} transition-all duration-500"></div>
+    `).join('')}
+</div>
+</div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyBwvv69uD9CWV2drSYc2Nm4P7Zw_qclzP0",
+        authDomain: "sincity-5ce88.firebaseapp.com",
+        projectId: "sincity-5ce88",
+        storageBucket: "sincity-5ce88.firebasestorage.app",
+        messagingSenderId: "275588874355",
+        appId: "1:275588874355:web:ebb3f4869e8a967cefea06"
+    };
 
-        // REPLACE THESE WITH YOUR ACTUAL KEYS FROM FIREBASE CONSOLE
-        const firebaseConfig = {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-  apiKey: "AIzaSyBwvv69uD9CWV2drSYc2Nm4P7Zw_qclzP0",
+    window.handleGameStart = async () => {
+        try {
+            console.log("Login initiated...");
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
 
-  authDomain: "sincity-5ce88.firebaseapp.com",
-
-  projectId: "sincity-5ce88",
-
-  storageBucket: "sincity-5ce88.firebasestorage.app",
-
-  messagingSenderId: "275588874355",
-
-  appId: "1:275588874355:web:ebb3f4869e8a967cefea06"
-
-};
-
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        window.loginWithGoogle = async () => {
-            try {
-                const result = await signInWithPopup(auth, provider);
-                return result.user;
-            } catch (error) {
-                console.error("Auth Error:", error);
-                alert("Login failed: " + error.message);
+            // Update UI
+            document.getElementById('display-name').innerText = `Det. ${user.displayName.toUpperCase()}`;
+            document.getElementById('briefing-screen').classList.add('hidden');
+            
+            // Check if GameState exists before calling init
+            if (window.GameState) {
+                window.GameState.playerName = user.displayName;
+                await window.GameState.init(); // This starts the DB fetch
+            } else {
+                console.error("GameState not found! Check script.js loading order.");
             }
-        };
-    </script>
+            
+            window.UI.log(`WELCOME, DET. ${user.displayName.toUpperCase()}.`, "text-cyan-400 font-bold");
+
+        } catch (error) {
+            console.error("Auth Error:", error);
+            alert("Google Login Failed. Check your Firebase Console settings.");
+        }
+    };
+</script>
+
     <script src="script.js"></script>
+    <script type="module">
+   // window.handleGameStart logic...
+</script>
 </body>
 </html>
