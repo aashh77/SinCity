@@ -322,6 +322,21 @@ const GameState = {
 
 const UI = {
     startInvestigation() {
+        const nameInput = document.getElementById('user-name-input').value;
+    GameState.playerName = nameInput || "DETECTIVE";
+    document.getElementById('display-name').innerText = `DET. ${GameState.playerName.toUpperCase()}`;
+    
+    // Smooth transition
+    const screen = document.getElementById('briefing-screen');
+    screen.style.opacity = '0';
+    
+    setTimeout(() => {
+        screen.style.display = 'none';
+        GameState.init();
+        // Initial immersion log
+        UI.log("LOCAL NETWORK ACCESSED...", "text-cyan-800 animate-pulse");
+        UI.log(`WELCOME, DET. ${GameState.playerName.toUpperCase()}.`, "text-cyan-400 font-bold");
+    }, 500);
         GameState.playerName = document.getElementById('user-name-input').value || "DETECTIVE";
         document.getElementById('display-name').innerText = `DET. ${GameState.playerName.toUpperCase()}`;
         document.getElementById('briefing-screen').style.opacity = '0';

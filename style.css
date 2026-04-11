@@ -104,3 +104,26 @@ body {
     from { opacity: 0; transform: translateX(-10px); }
     to { opacity: 1; transform: translateX(0); }
 }
+
+/* Typewriter effect for the briefing */
+#briefing-screen p {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: .15em solid transparent;
+    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--cyan); }
+}
+
+/* Add a subtle glow to the briefing box */
+.neon-box-cyan {
+    box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.05), 0 0 40px rgba(0, 0, 0, 0.5);
+}
