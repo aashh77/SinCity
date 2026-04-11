@@ -6,25 +6,30 @@ const GameState = {
     currentTarget: null,
     patience: {}, 
 
-    locations: {
-        "VIP Suite": { chars: ["Elena", "PA-Julian", "VIP-Arrogant"], clue: "Oakhaven Diary" },
-        "Main Floor": { chars: ["Manager", "Guard", "VIP-Stammer"], clue: "Drug Database" },
-        "Bar Lounge": { chars: ["VIP-Deaf", "PA-Viktor", "PA-Jax"], clue: "Casino Ledger" }
-    },
+   evidenceMeta: { 
+    "Pocket Knife": "🔪", 
+    "Post-Mortem Report": "📄", 
+    "Syringe Mark": "💉", 
+    "Oakhaven Diary": "📓", 
+    "Drug Database": "💾", 
+    "Casino Ledger": "📊",
+    "Gold Lipstick": "💄",    // New: Affair clue
+    "Half-Eaten Apple": "🍎", // New: Useless clue
+    "Crumpled Note": "📝"     // New: Red herring
+},
 
-    evidenceMeta: { 
-        "Pocket Knife": "🔪", 
-        "Post-Mortem Report": "📄", 
-        "Syringe Mark": "💉", 
-        "Oakhaven Diary": "📓", 
-        "Drug Database": "💾", 
-        "Casino Ledger": "📊" 
-    },
+// --- UPDATED LOCATIONS (Redistributed Clues) ---
+locations: {
+    "VIP Suite": { chars: ["Elena", "PA-Julian", "VIP-Arrogant"], clue: "Oakhaven Diary" },
+    "Main Floor": { chars: ["Manager", "Guard", "VIP-Stammer"], clue: "Gold Lipstick" }, // Found near the Guard
+    "Bar Lounge": { chars: ["VIP-Deaf", "PA-Viktor", "PA-Jax"], clue: "Half-Eaten Apple" } // Useless
+},
 
     async init() {
         this.renderMap();
-        this.startClock();
+        
         this.updateUI();
+        this.startClock();
 
         try {
             const response = await fetch('http://localhost:5000/api/subjects');
@@ -56,29 +61,36 @@ const GameState = {
     },
     // Inside GameState object
 startClock() {
-    setInterval(() => {
-        this.time -= 1; // Drop 1 minute
+    // Clear any existing clock first to prevent "double speed" timers
+    if (this.gameClockInterval) clearInterval(this.gameClockInterval);
+
+    // Using an arrow function () => ensures 'this' refers to GameState
+    this.gameClockInterval = setInterval(() => {
+        this.time -= 1;
+        
+        // Debugging: This will show in your F12 console to prove it's ticking
+        console.log("Tick... Time remaining:", this.time);
+
         this.updateUI();
 
-        // CHECK FOR GAME OVER
         if (this.time <= 0) {
-            this.gameOver("TIME EXPIRED: The killer has escaped the city. You failed.");
+            this.gameOver("TIME EXPIRED: The killer has escaped the city.");
         }
-    }, 1000); // 1000ms = 1 real second equals 1 in-game minute
+    }, 1000); 
 },
 
 gameOver(reason) {
-    // 1. Stop the clock
-    clearInterval(this.gameClockInterval);
+    // Stop the actual interval using the ID we stored
+    if (this.gameClockInterval) {
+        clearInterval(this.gameClockInterval);
+    }
     
-    // 2. Disable input so they can't keep playing
     const input = document.getElementById('player-input');
     if (input) {
         input.disabled = true;
         input.placeholder = "CASE TERMINATED.";
     }
 
-    // 3. Visual Lockdown
     document.body.style.filter = "grayscale(100%) brightness(50%)";
     UI.typeLog(`SYSTEM STATUS: ${reason}`, "text-white font-bold text-center text-xl block mt-10");
 },
@@ -173,15 +185,16 @@ async submitFinalTheory() {
     },
 
     handleSearch() {
-        const clue = this.locations[this.currentLoc].clue;
-        if (clue && !this.inventory.includes(clue)) {
-            this.inventory.push(clue);
-            UI.log(`INTEL RECOVERED: ${clue.toUpperCase()}`, "text-yellow-400 font-bold");
-            this.updateUI();
-        } else {
-            UI.log("AREA CLEARED. NO NEW EVIDENCE FOUND.", "text-slate-500");
-        }
-    },
+    const clue = this.locations[this.currentLoc].clue;
+    // This will now correctly pull "Gold Lipstick" if you are on the Main Floor
+    if (clue && !this.inventory.includes(clue)) {
+        this.inventory.push(clue);
+        UI.log(`INTEL RECOVERED: ${clue.toUpperCase()}`, "text-yellow-400 font-bold");
+        this.updateUI();
+    } else {
+        UI.log("AREA CLEARED. NO NEW EVIDENCE FOUND.", "text-slate-500");
+    }
+},
 
     selectTarget(name) {
         this.currentTarget = name;
@@ -226,16 +239,25 @@ async submitFinalTheory() {
     },
 
     askCurrentTarget(clue) {
-        if (!this.currentTarget) {
-            if (clue === "Oakhaven Diary") {
-                UI.log("DIARY ENTRY: 'Finally out of Oakhaven. New life, new name. I just hope Elias never finds me. I can still smell the chemicals from his lab...'", "text-yellow-200 italic p-3 border-l-2 border-yellow-500 bg-yellow-950/20");
-            } else {
-                UI.log("SELECT A SUBJECT TO SHOW THIS EVIDENCE.", "text-cyan-600 uppercase text-[10px]");
-            }
-            return;
-        }
-        this.aiTalk(this.currentTarget, `[SHOWS EVIDENCE: ${clue.toUpperCase()}] Explain this.`);
-    },
+    if (!this.currentTarget) {
+        const dialogs = {
+            "Oakhaven Diary": "DIARY ENTRY: '...I just hope Elias never finds me. I can still smell the chemicals...'",
+            "Gold Lipstick": "A expensive shade of 'Sunset Gold'. There's a smudge on the cap that matches the Guard's uniform fabric.",
+            "Half-Eaten Apple": "It's browning. Someone was eating this during the murder. Utterly useless for the case, but someone has bad manners.",
+            "Syringe Mark": "FORENSIC NOTE: A microscopic puncture. Precision work. Not a typical medical injection."
+        };
+        
+        UI.log(dialogs[clue] || `SELECT A SUBJECT TO SHOW THIS ${clue.toUpperCase()}.`, "text-cyan-600 italic");
+        return;
+    }
+
+    // Special behavior: If showing Lipstick to the Guard or the VIP
+    let customMessage = `[SHOWS EVIDENCE: ${clue.toUpperCase()}] Explain this.`;
+    if (clue === "Gold Lipstick" && (this.currentTarget === "Guard" || this.currentTarget === "VIP-Arrogant")) {
+        customMessage = `[CONFRONTS WITH AFFAIR EVIDENCE: ${clue.toUpperCase()}] I know about the secret meetings. Start talking.`;
+    }
+
+    this.aiTalk(this.currentTarget, customMessage);},
 
     recoveryHeartbeat() {
         let changed = false;
@@ -250,18 +272,27 @@ async submitFinalTheory() {
     },
 
     updateUI() {
-        const timer = document.getElementById('timer-display');
-if (timer) {
-    const hours = Math.floor(this.time / 60);
-    const mins = this.time % 60;
-    // Formats it to 00:00 style
-    timer.innerText = `TIME REMAINING: ${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-    
-    // Visual warning when time is low
-    if (this.time < 120) { // Less than 2 hours left
-        timer.classList.add('text-red-500', 'blink');
+    // 1. Update Timer Text
+    const timerDisplay = document.getElementById('timer-display');
+    const timeDisplayLarge = document.getElementById('time-display');
+    const timeBar = document.getElementById('time-bar');
+
+    if (timerDisplay) {
+        const hours = Math.floor(this.time / 60);
+        const mins = this.time % 60;
+        const formatted = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+        
+        timerDisplay.innerText = `REMAINING: ${formatted}`;
+        if (timeDisplayLarge) timeDisplayLarge.innerText = formatted;
+        
+        // Update the visual bar percentage (out of 1440 mins)
+        if (timeBar) timeBar.style.width = `${(this.time / 1440) * 100}%`;
+
+        if (this.time < 120) {
+            timerDisplay.classList.add('text-red-500', 'blink');
+            if(timeBar) timeBar.classList.replace('bg-cyan-500', 'bg-red-600');
+        }
     }
-}
         const panel = document.getElementById('character-panel');
         if (panel) {
             const currentChars = this.locations[this.currentLoc].chars;

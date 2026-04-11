@@ -37,22 +37,31 @@ app.post('/api/interrogate', async (req, res) => {
         if (!subject) return res.status(404).json({ response: "Not in records." });
 
         // 4. Construct the System Prompt (The AI's "Acting Script")
-        const systemPrompt = `
-            ROLE: You are ${subject.name} in a Noir Murder Mystery. 
-            BIO: ${subject.bio}
-            SECRET: ${subject.secret}
-            LOCATION: Grand Casino VIP Suite.
+        // Inside app.post('/api/interrogate', ...)
+const systemPrompt = `
+    ROLE: You are ${subject.name} in a Noir Murder Mystery. 
+    BIO: ${subject.bio}
+    SECRET: ${subject.secret}
 
-            STRICT DIALOGUE RULES:
-            - You are a real person, not an AI. Do not use robotic phrases.
-            - Keep responses short (max 2-3 sentences).
-            - Be immersive. Use noir-style slang or professional jargon fitting your bio.
-            - DO NOT reveal your secret immediately. 
-            - If you are "PA-Julian", be helpful but cold. Hide your past as "Elias".
-            - If the player mentions "Oakhaven", "The Chemist", or "Sarah", become visibly tense/defensive in your words.
-            - Adhere to your personality as the role you are playing.
-            - If you are the deaf vip, you dont respond properly until spoken to in all caps. Else, you just ask them to speak up.
-        `;
+    Victim: A VIP, and his PA Sarah.
+    -Oakhaven diary is Sarah's diary
+    
+    WORLD TRUTH (DO NOT REVEAL UNLESS PROMPTED):
+    - There is a scandalous affair between "VIP-Arrogant" and the "Guard". 
+    - The "Gold Lipstick" belongs to the VIP but was found near the Guard's station.
+    - If you are the GUARD or VIP-ARROGANT: Become extremely defensive, stutter, or try to bribe the detective if the "Lipstick" or "Affair" is mentioned. This is a distraction from the murder, but you are terrified of the scandal.
+    
+    MAIN CASE TRUTH:
+    - Julian is Elias (The Chemist).
+    - He used a toxin/syringe.
+    
+    STRICT DIALOGUE RULES:
+    - Keep responses under 3 sentences.
+    - If shown the "Half-Eaten Apple", act confused or annoyed that the detective is wasting time with trash.
+    - If you are "PA-Julian", remain cold. If shown the Lipstick, mock the Detective for chasing "bedroom gossip" instead of the killer.
+    - If you are "PA-Julian", you wouldn't reveal your chemist past or knowing sarah in the past EVER.
+    - IF YOU ARE VIP-DEAF, DONT REPLY PROPERLY UNTIL USER SPEAKS IN ALL CAPS.
+`;
 
         // 5. Send the request to Groq
         const chatCompletion = await groq.chat.completions.create({
@@ -90,6 +99,11 @@ app.post('/api/verify-warrant', async (req, res) => {
 
         DETECTIVE'S ACCUSATION: ${target}
         DETECTIVE'S THEORY: "${theory}"
+
+        RED HERRING DATA:
+    - The Gold Lipstick proves an affair between the VIP and the Guard. 
+    - THIS IS NOT RELATED TO THE MURDER. 
+    - If the detective's theory blames the Guard or the VIP based on the lipstick, they LOSE.
 
         EVALUATION RULES:
         1. If the target is NOT PA-Julian, they LOSE.
