@@ -1,65 +1,20 @@
 const GameState = {
-    time: 1440, // 24 hours in minutes
+    time: 1440,
     playerName: "Detective",
     currentLoc: "VIP Suite",
     inventory: ["Pocket Knife", "Post-Mortem Report", "Syringe Mark"],
     currentTarget: null,
 
     patience: { 
-        "Elena": { 
-            val: 10, max: 10, icon: "🧹", 
-            bio: "Casino maid. Knows the service vents and staff schedules better than the architect.",
-            suspicion: [], 
-            secret: "I wasn't in the room! The Guard and I were... occupied in the closet." 
-        },
-        "Manager": { 
-            val: 5, max: 5, icon: "💼", 
-            bio: "Oversees floor operations. Deeply in debt to the House, making him desperate for a clean-up.",
-            suspicion: [], 
-            secret: "I hate VIPs, but I'm no killer. I just look the other way for a price." 
-        },
-        "Guard": { 
-            val: 8, max: 8, icon: "🛡️", 
-            bio: "Former military. Recently disciplined for missing a shift during a high-stakes heist.",
-            suspicion: [], 
-            secret: "The logs are fake. I was with Elena. Check the service lift cameras if you don't believe me." 
-        },
-        "VIP-Arrogant": { 
-            val: 4, max: 4, icon: "💎", 
-            bio: "Old money, new vices. Thinks everyone in this casino is beneath his custom-tailored boots.",
-            suspicion: [], 
-            secret: "I was having a 'private meeting' with the Guard. Don't tell my wife; she controls the trust fund." 
-        },
-        "VIP-Stammer": { 
-            val: 6, max: 6, icon: "😰", 
-            bio: "A regular at the baccarat tables. Looks like he hasn't slept since the victim arrived.",
-            suspicion: [], 
-            secret: "I-I-I saw Julian hide a needle! He looked... possessed! Like he was finishing a ritual." 
-        },
-        "VIP-Deaf": { 
-            val: 10, max: 10, icon: "🧏", 
-            bio: "A retired judge. Hard of hearing, but has the sharpest eyes in the lounge.",
-            suspicion: [], 
-            secret: "WHAT? SYRINGE? I KNEW THAT PA WAS A FREAK! I saw him leaving the Chemist's room!" 
-        },
-        "PA-Julian": { 
-            val: 5, max: 5, icon: "🧪", 
-            bio: "The victim's personal assistant. Expert in high-end pharmaceuticals and synthetic toxins.",
-            suspicion: [], 
-            secret: "Elias is dead, Detective. I am someone else now. This city changes people." 
-        },
-        "PA-Viktor": { 
-            val: 6, max: 6, icon: "👔", 
-            bio: "Junior assistant to the victim. Loyal to a fault, or perhaps just terrified.",
-            suspicion: [], 
-            secret: "Julian is too calm. Cold as ice. He didn't even flinch when the body was found." 
-        },
-        "PA-Jax": { 
-            val: 5, max: 5, icon: "🧥", 
-            bio: "The security-minded assistant. Always carries a pocket knife and a hidden recorder.",
-            suspicion: [], 
-            secret: "I saw someone by the service lift around 2 AM. Tall, wearing a lab coat. Julian's coat." 
-        }
+        "Elena": { val: 10, max: 10, icon: "🧹", bio: "Casino maid. Knows the service vents.", suspicion: [], secret: "I wasn't in the room! The Guard and I were... occupied in the closet." },
+        "Manager": { val: 5, max: 5, icon: "💼", bio: "Oversees floor operations. Deeply in debt.", suspicion: [], secret: "I hate VIPs, but I'm no killer." },
+        "Guard": { val: 8, max: 8, icon: "🛡️", bio: "Former military. Recently disciplined.", suspicion: [], secret: "The logs are fake. I was with Elena." },
+        "VIP-Arrogant": { val: 4, max: 4, icon: "💎", bio: "Old money. Hiding a scandal.", suspicion: [], secret: "I was having a 'private meeting'. Don't tell my wife." },
+        "VIP-Stammer": { val: 6, max: 6, icon: "😰", bio: "Regular gambler. Witnessed the event.", suspicion: [], secret: "I saw Julian hide a needle! He looked possessed!" },
+        "VIP-Deaf": { val: 10, max: 10, icon: "🧏", bio: "Retired judge. Sharp eyes.", suspicion: [], secret: "WHAT? I saw that PA leaving the Chemist's room!" },
+        "PA-Julian": { val: 5, max: 5, icon: "🧪", bio: "Expert in toxins. Extremely calm.", suspicion: [], secret: "Elias is dead, Detective. I am someone else now." },
+        "PA-Viktor": { val: 6, max: 6, icon: "👔", bio: "Junior assistant. Terrified.", suspicion: [], secret: "Julian is too calm. Cold as ice." },
+        "PA-Jax": { val: 5, max: 5, icon: "🧥", bio: "Security minded. Always recording.", suspicion: [], secret: "I saw someone in a lab coat. Julian's coat." }
     },
 
     locations: {
@@ -68,26 +23,12 @@ const GameState = {
         "Bar Lounge": { chars: ["VIP-Deaf", "PA-Viktor", "PA-Jax"], clue: "Casino Ledger" }
     },
 
-    evidenceMeta: {
-        "Pocket Knife": "🔪", "Post-Mortem Report": "📄", "Syringe Mark": "💉",
-        "Oakhaven Diary": "📓", "Drug Database": "💾", "Casino Ledger": "📊",
-        "ID: Sarah (Victim)": "🆔", "ID: Elias (Chemist)": "🧪"
-    },
+    evidenceMeta: { "Pocket Knife": "🔪", "Post-Mortem Report": "📄", "Syringe Mark": "💉", "Oakhaven Diary": "📓", "Drug Database": "💾", "Casino Ledger": "📊" },
 
     init() {
         this.renderMap();
         this.updateUI();
-
-        // 1. Enter Key Listener
-        const inputField = document.getElementById('player-input');
-        inputField.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); 
-                this.handleInput();
-            }
-        });
-
-        UI.log("SYSTEM ONLINE. BEGIN INVESTIGATION.", "text-cyan-500 font-bold");
+        document.getElementById('player-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') this.handleInput(); });
         setInterval(() => this.recoveryHeartbeat(), 20000);
     },
 
@@ -95,12 +36,11 @@ const GameState = {
         const input = document.getElementById('player-input');
         const raw = input.value.trim();
         if (!raw) return;
-
         const cmd = raw.toUpperCase();
 
         if (cmd.startsWith("TALK TO")) {
             const name = Object.keys(this.patience).find(n => cmd.includes(n.toUpperCase()));
-            if (name) this.selectTarget(name, raw.split(":")[1] || null);
+            if (name) this.selectTarget(name);
         } else if (cmd === "SEARCH") {
             this.handleSearch();
         } else if (this.currentTarget) {
@@ -109,54 +49,37 @@ const GameState = {
         input.value = "";
     },
 
-    selectTarget(name, initialMsg) {
+    selectTarget(name) {
         this.currentTarget = name;
         this.updateUI();
-        if (initialMsg) this.aiTalk(name, initialMsg);
-        document.getElementById('player-input').placeholder = `INTERROGATING ${name.toUpperCase()}...`;
+        UI.log(`INTERROGATING ${name.toUpperCase()}`, "text-cyan-400 text-[10px] tracking-widest");
     },
 
     async aiTalk(name, message) {
-        const msg = message.toLowerCase(); // Use lowercase for keywords
-        let response = "I have nothing to say about that, Detective.";
+        const msg = message.toLowerCase();
+        let response = "I have nothing to say about that.";
         const p = this.patience[name];
 
-        if (p.val <= 0) return UI.log(`${name.toUpperCase()} IS UNRESPONSIVE.`, "text-red-500 font-black");
+        if (p.val <= 0) return UI.log(`${name.toUpperCase()} IS TIRED OF YOUR QUESTIONS.`, "text-red-500 font-black");
         
         p.val--;
         this.updateTime(5); 
-        UI.log(`${this.playerName.toUpperCase()}: "${message}"`, "text-slate-500 italic text-[10px]");
 
-        // --- DYNAMIC RESPONSE LOGIC ---
-        
+        // DETECTIVE SPEECH LOGGING (LARGER TEXT)
+        UI.log(`${this.playerName.toUpperCase()}: "${message}"`, "detective-speech font-bold italic");
+
         if (name === "VIP-Deaf" && message !== message.toUpperCase()) {
             response = "WHAT?! SPEAK UP! I CAN'T HEAR YOU!";
-        } 
-        
-        // 1. Alibi Logic (Elena, Guard, Arrogant)
-        else if (msg.includes("affair") || msg.includes("closet") || msg.includes("guard") || msg.includes("elena")) {
-            if (name === "Elena" || name === "Guard" || name === "VIP-Arrogant") {
-                response = p.secret; // <--- This pulls the EXACT string from your data
-            }
-        }
-
-        // 2. The Killer's Identity (Julian / Elias / Oakhaven)
-        else if (msg.includes("elias") || msg.includes("oakhaven") || msg.includes("diary") || msg.includes("julian")) {
-            if (name === "PA-Julian") { 
-                p.val = 0; 
-                response = p.secret; // <--- Pulls EXACT string for Julian
-            }
+        } else if (msg.includes("affair") || msg.includes("closet") || msg.includes("guard") || msg.includes("elena")) {
+            if (["Elena", "Guard", "VIP-Arrogant"].includes(name)) response = p.secret;
+        } else if (msg.includes("elias") || msg.includes("oakhaven") || msg.includes("diary") || msg.includes("julian")) {
+            if (name === "PA-Julian") { p.val = 0; response = p.secret; }
             else if (name === "VIP-Deaf") response = "OAKHAVEN? THE ASSISTANT JULIAN IS FROM THERE!";
-            else response = "I don't know anything about that.";
         }
 
-        // --- THE "CATCHER" ---
-        // Now that response IS p.secret, this comparison will finally work!
-        if (response === p.secret && !p.suspicion.includes(response)) {
-            p.suspicion.push(response);
-        }
+        if (response === p.secret && !p.suspicion.includes(response)) p.suspicion.push(response);
 
-        this.updateUI(); // Refreshes the Dossier Popup immediately
+        this.updateUI();
         await UI.typeLog(`${name}: "${response}"`, "text-white font-bold border-l-2 border-cyan-500 pl-4 bg-cyan-950/20 py-2 rounded-r");
     },
 
@@ -164,13 +87,8 @@ const GameState = {
         const clue = this.locations[this.currentLoc].clue;
         if (clue && !this.inventory.includes(clue)) {
             this.inventory.push(clue);
-            // Timer Change: Search cost
             this.updateTime(15); 
             UI.log(`DATA RECOVERED: ${clue.toUpperCase()}`, "text-yellow-400 font-black");
-            if (clue === "Oakhaven Diary") { 
-                this.inventory.push("ID: Sarah (Victim)"); 
-                this.inventory.push("ID: Elias (Chemist)"); 
-            }
             this.updateUI();
         } else UI.log("NO NEW INTEL FOUND.");
     },
@@ -179,7 +97,6 @@ const GameState = {
         if (this.currentLoc === loc) return;
         this.currentLoc = loc;
         this.currentTarget = null;
-        // Timer Change: Travel cost
         this.updateTime(20); 
         UI.log(`MOVED TO ${loc.toUpperCase()}`, "text-cyan-800 tracking-[0.3em]");
         document.getElementById('current-loc-label').innerText = `LOC: ${loc.toUpperCase()}`;
@@ -190,8 +107,6 @@ const GameState = {
         const panel = document.getElementById('character-panel');
         panel.innerHTML = this.locations[this.currentLoc].chars.map(c => {
             const char = this.patience[c];
-            
-            // Generate the list of suspicious quotes for the popup
             const suspicionList = char.suspicion.length > 0 
                 ? char.suspicion.map(q => `<li class="mb-2 border-l-2 border-red-600 pl-2 text-white">"${q}"</li>`).join('') 
                 : `<li class="text-slate-500 italic">No incriminating statements recorded.</li>`;
@@ -207,17 +122,13 @@ const GameState = {
                             </div>
                         </div>
                     </div>
-
                     <div class="bio-popup">
                         <p class="text-cyan-400 font-black text-[8px] tracking-[0.3em] mb-2 border-b border-cyan-900 pb-1">SUBJECT_DOSSIER // ${c.toUpperCase()}</p>
                         <p class="text-slate-400 text-[9px] leading-relaxed mb-4">${char.bio}</p>
-                        <p class="text-red-500 font-black text-[7px] tracking-widest mb-2 uppercase">Suspicious Activity:</p>
-                        <ul class="list-none text-[9px] space-y-1">
-                            ${suspicionList}
-                        </ul>
+                        <p class="text-red-500 font-black text-[7px] tracking-widest mb-2 uppercase">Statements:</p>
+                        <ul class="list-none text-[9px] space-y-1">${suspicionList}</ul>
                     </div>
-                </div>
-            `;
+                </div>`;
         }).join('');
 
         const ev = document.getElementById('evidence-list');
@@ -238,72 +149,23 @@ const GameState = {
     },
 
     renderMap() {
-    const svg = document.getElementById('casino-map');
-    if (!svg) return;
-
-    // A slightly larger viewbox gives us room to draw a "hallway" floor plan
-    // [Central Hallway] with [Bar] to left, [Suite] top, [Main Floor] bottom
-    const locs = [
-        { n: "VIP Suite",   x: 65,  y: 10,  w: 110, h: 50, icon: "♠️" },
-        { n: "Bar Lounge",  x: 5,   y: 80,  w: 110, h: 50, icon: "🍸" },
-        { n: "Main Floor",  x: 125, y: 80,  w: 110, h: 50, icon: "🎰" }
-    ];
-
-    // Reset viewbox to match the original layout proportions for high resolution
-    svg.setAttribute("viewBox", "0 0 240 240");
-
-    svg.innerHTML = `
-        <path d="M120,60 V190 M10,130 H230" stroke="#00f3ff22" stroke-width="1" />
-        <circle cx="120" cy="130" r="10" fill="#020617" stroke="#00f3ff22" />
-
-        ${locs.map(l => {
-            const isActive = this.currentLoc === l.n;
-            const targetColor = isActive ? "#00f3ff" : "#1e293b"; // Bright cyan vs dark blue-gray
-            const bgColor = isActive ? "#00f3ff11" : "#0f172a80"; // Slight glow vs dark slate
-            
-            return `
-                <g onclick="GameState.travel('${l.n}')" class="map-node group" style="cursor: pointer;">
-                    
-                    <rect x="${l.x}" y="${l.y}" width="${l.w}" height="${l.h}" rx="6" 
-                          fill="${bgColor}" 
-                          stroke="${targetColor}" 
-                          stroke-width="${isActive ? '2' : '1'}"
-                          class="transition-all duration-300 group-hover:stroke-cyan-500 group-hover:fill-cyan-950/40" />
-                    
-                    <text x="${l.x + l.w/2}" y="${l.y + l.h/2 - 2}" 
-                          text-anchor="middle" 
-                          fill="${isActive ? '#fff' : '#475569'}" 
-                          font-size="14" 
-                          class="pointer-events-none transition-all duration-300 group-hover:fill-white">
-                          ${l.icon}
-                    </text>
-
-                    <text x="${l.x + l.w/2}" y="${l.y + l.h/2 + 15}" 
-                          text-anchor="middle" 
-                          fill="${isActive ? '#fff' : '#475569'}" 
-                          font-family="monospace" 
-                          font-weight="900" 
-                          font-size="8" 
-                          style="pointer-events: none; text-transform: uppercase; letter-spacing: 1px;"
-                          class="transition-all duration-300 group-hover:fill-white">
-                          ${l.n}
-                    </text>
-                    
-                    ${isActive ? `
-                        <circle cx="${l.x + 10}" cy="${l.y + 10}" r="3" fill="#00f3ff" class="animate-pulse shadow-[0_0_10px_#00f3ff]" />
-                    ` : ''}
-                </g>
-            `;
-        }).join('')}
-    `;
-},
+        const svg = document.getElementById('casino-map');
+        const locs = [
+            { n: "VIP Suite", x: 65, y: 10, w: 110, h: 50, icon: "♠️" },
+            { n: "Bar Lounge", x: 5, y: 80, w: 110, h: 50, icon: "🍸" },
+            { n: "Main Floor", x: 125, y: 80, w: 110, h: 50, icon: "🎰" }
+        ];
+        svg.innerHTML = locs.map(l => {
+            const active = this.currentLoc === l.n;
+            return `<g onclick="GameState.travel('${l.n}')" class="cursor-pointer">
+                <rect x="${l.x}" y="${l.y}" width="${l.w}" height="${l.h}" rx="4" fill="${active ? '#00f3ff22' : '#0f172a'}" stroke="${active ? '#00f3ff' : '#1e293b'}" />
+                <text x="${l.x+l.w/2}" y="${l.y+30}" text-anchor="middle" fill="white" font-size="10">${l.icon} ${l.n}</text>
+            </g>`;
+        }).join('');
+    },
 
     updateTime(m) {
         this.time -= m;
-        if (this.time <= 0) {
-            alert("TIME EXPIRED. THE KILLER ESCAPED.");
-            location.reload();
-        }
         document.getElementById('time-display').innerText = `${Math.floor(this.time/60).toString().padStart(2,'0')}:${(this.time%60).toString().padStart(2,'0')}`;
         document.getElementById('time-bar').style.width = `${(this.time/1440)*100}%`;
     },
@@ -323,25 +185,16 @@ const GameState = {
 const UI = {
     startInvestigation() {
         const nameInput = document.getElementById('user-name-input').value;
-    GameState.playerName = nameInput || "DETECTIVE";
-    document.getElementById('display-name').innerText = `DET. ${GameState.playerName.toUpperCase()}`;
-    
-    // Smooth transition
-    const screen = document.getElementById('briefing-screen');
-    screen.style.opacity = '0';
-    
-    setTimeout(() => {
-        screen.style.display = 'none';
-        GameState.init();
-        // Initial immersion log
-        UI.log("LOCAL NETWORK ACCESSED...", "text-cyan-800 animate-pulse");
-        UI.log(`WELCOME, DET. ${GameState.playerName.toUpperCase()}.`, "text-cyan-400 font-bold");
-    }, 500);
-        GameState.playerName = document.getElementById('user-name-input').value || "DETECTIVE";
+        GameState.playerName = nameInput || "DETECTIVE";
         document.getElementById('display-name').innerText = `DET. ${GameState.playerName.toUpperCase()}`;
-        document.getElementById('briefing-screen').style.opacity = '0';
-        setTimeout(() => document.getElementById('briefing-screen').style.display = 'none', 500);
-        GameState.init();
+        const screen = document.getElementById('briefing-screen');
+        screen.style.opacity = '0';
+        setTimeout(() => {
+            screen.style.display = 'none';
+            GameState.init();
+            UI.log("LOCAL NETWORK ACCESSED...", "text-cyan-800 animate-pulse");
+            UI.log(`WELCOME, DET. ${GameState.playerName.toUpperCase()}.`, "text-cyan-400 font-bold");
+        }, 500);
     },
     log(m, c) {
         const l = document.getElementById('game-log');
@@ -365,5 +218,4 @@ const UI = {
     toggleAccusation() { document.getElementById('accuse-modal').classList.toggle('hidden'); }
 };
 
-window.UI = UI;
-window.GameState = GameState;
+window.UI = UI; window.GameState = GameState;

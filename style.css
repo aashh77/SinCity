@@ -27,6 +27,29 @@ body {
     50%, 98% { background: var(--blue); }
 }
 
+/* BRIEFING SCREEN ANIMATION FIX */
+#briefing-screen p {
+    white-space: normal !important;
+    overflow-y: visible;
+    animation: fadeIn 1.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* DETECTIVE SPEECH INCREASE */
+.detective-speech {
+    font-size: 1.1rem !important;
+    color: #f1f5f9 !important;
+    margin-top: 15px !important;
+    margin-bottom: 5px !important;
+    border-left: 3px solid var(--cyan);
+    padding-left: 10px;
+    letter-spacing: 0.02em;
+}
+
 /* COMPONENTS */
 .neon-box {
     background: rgba(7, 10, 25, 0.7); backdrop-filter: blur(20px);
@@ -35,6 +58,7 @@ body {
 
 .neon-box-cyan {
     background: rgba(7, 10, 25, 0.95); border: 1px solid var(--cyan);
+    box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.05);
 }
 
 /* CHARACTER CARDS */
@@ -46,84 +70,26 @@ body {
 .char-card:hover { border-color: var(--cyan); transform: translateX(5px); }
 .char-card.active-target {
     border-color: var(--cyan); background: rgba(0, 243, 255, 0.1);
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
-}
-.char-card.active-target::after {
-    content: "● LIVE"; position: absolute; top: 4px; right: 8px;
-    font-size: 7px; color: var(--cyan); font-weight: 900;
 }
 
-/* EVIDENCE */
-.evidence-tile {
-    background: rgba(255, 204, 0, 0.05); border: 1px solid rgba(255, 204, 0, 0.2);
-    aspect-ratio: 1/1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 8px;
-    padding: 8px; cursor: pointer; transition: 0.3s;
-}
-.evidence-tile:hover {
-    background: var(--gold); color: #000;
-    box-shadow: 0 0 20px rgba(255, 204, 0, 0.4); transform: scale(1.05);
-}
-
-/* MAP */
-.map-node { fill: #000; stroke: rgba(0, 243, 255, 0.15); cursor: pointer; transition: 0.4s; }
-.map-node.active { stroke: var(--cyan); fill: rgba(0, 243, 255, 0.1); filter: drop-shadow(0 0 10px var(--cyan)); stroke-width: 3; }
-
-.custom-scrollbar::-webkit-scrollbar { width: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.2); border-radius: 10px; }
-
-/* --- THE ULTIMATE POPUP FIX --- */
+/* DOSSIER POPUP */
 .bio-popup {
     display: none;
-    position: absolute; /* Switched back to absolute to scroll with the name */
-    left: 100%;        /* Sticks to the right edge of the card */
+    position: absolute;
+    left: 105%;
     top: 0;
-    margin-left: 20px;
     width: 260px;
     background: rgba(2, 6, 23, 0.98);
     backdrop-filter: blur(15px);
     border: 1px solid var(--cyan);
     padding: 18px;
-    z-index: 9999;     /* Ensure it sits on top of the chat log */
+    z-index: 9999;
     pointer-events: none;
     box-shadow: 0 0 40px rgba(0, 0, 0, 1);
 }
 
-/* Force the character panel and sidebar to let the popup out */
-#character-panel, aside {
-    overflow: visible !important;
-}
+#character-panel, aside { overflow: visible !important; }
+.char-card:hover .bio-popup { display: block; }
 
-/* Show the popup on hover */
-.char-card:hover .bio-popup {
-    display: block;
-    animation: dossierSlide 0.2s ease-out;
-}
-
-@keyframes dossierSlide {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-/* Typewriter effect for the briefing */
-#briefing-screen p {
-    overflow: hidden;
-    white-space: nowrap;
-    border-right: .15em solid transparent;
-    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
-}
-
-@keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
-}
-
-@keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: var(--cyan); }
-}
-
-/* Add a subtle glow to the briefing box */
-.neon-box-cyan {
-    box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.05), 0 0 40px rgba(0, 0, 0, 0.5);
-}
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.2); border-radius: 10px; }
