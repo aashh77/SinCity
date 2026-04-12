@@ -4,77 +4,135 @@ require('dotenv').config();
 
 // All character traits and secrets exactly as they were in your game
 const subjects = [
+
     { 
-        name: "Elena", 
-        icon: "🧹", 
-        bio: "Casino maid. Knows the service vents.", 
-        secret: "I wasn't in the room! The Guard and I were occupied in the closet.",
-        patienceVal: 10,
-        patienceMax: 10
-    },
-    { 
-        name: "Manager", 
-        icon: "💼", 
-        bio: "Oversees floor operations. Deeply in debt.", 
-        secret: "I hate VIPs, but I'm no killer.",
-        patienceVal: 5,
-        patienceMax: 5
-    },
-    { 
-        name: "Guard", 
-        icon: "🛡️", 
-        bio: "Former military. Recently disciplined.", 
-        secret: "The logs are fake. I was with Elena.",
-        patienceVal: 8,
-        patienceMax: 8
-    },
-    { 
-        name: "VIP-Arrogant", 
-        icon: "💎", 
-        bio: "Old money. Hiding a scandal.", 
-        secret: "I was having a 'private meeting'. Don't tell my wife.",
-        patienceVal: 4,
-        patienceMax: 4
-    },
-    { 
-        name: "VIP-Stammer", 
-        icon: "😰", 
-        bio: "Regular gambler. Witnessed the event.", 
-        secret: "I saw Julian hide a needle! He looked possessed!",
-        patienceVal: 6,
-        patienceMax: 6
-    },
-    { 
-        name: "VIP-Deaf", 
-        icon: "🧏", 
-        bio: "Retired judge. Sharp eyes.", 
-        secret: "WHAT? I saw that PA leaving the Chemist's room!",
-        patienceVal: 10,
-        patienceMax: 10
-    },
-    { 
+
         name: "PA-Julian", 
+
         icon: "🧪", 
-        bio: "Expert in toxins. Extremely calm.", 
-        secret: "Elias is dead, Detective. I am someone else now.",
+
+        bio: "An expert in synthetic toxins. Speaks with terrifying, clinical precision. He seems far too calm for a double homicide scene.", 
+
+        secret: "Elias didn't die in that prison transport, Detective. He just found a better suit. Sarah was a loose end from Oakhaven that had to be cut.",
+
         patienceVal: 5,
+
         patienceMax: 5
+
     },
+
     { 
+
+        name: "Elena", 
+
+        icon: "🧹", 
+
+        bio: "The casino's youngest maid. She is hyperventilating and scrubbing the floor frantically, refusing to look up.", 
+
+        secret: "I just want to go home. The blood... I've never seen so much blood. I didn't see anything else, I promise. Please just let me leave.",
+
+        patienceVal: 10,
+
+        patienceMax: 10
+
+    },
+
+    { 
+
+        name: "VIP-Arrogant", 
+
+        icon: "💎", 
+
+        bio: "Old money with a sharp tongue. She seems more worried about her reputation than the dead bodies in the suite.", 
+
+        secret: "If the papers find out I was with the Guard, I'm finished. My husband would have me in the streets by morning.",
+
+        patienceVal: 4, patienceMax: 4
+
+    },
+
+    { 
+
+        name: "Guard", 
+
+        icon: "🛡️", 
+
+        bio: "Former military. He has a nervous facial tic and keeps checking the hallway cameras with trembling hands.", 
+
+        secret: "I abandoned my post for a few minutes. If the Floor Manager finds out the VIP suite was unguarded on my watch, I'm done.",
+
+        patienceVal: 8, patienceMax: 8
+
+    },
+
+    { 
+
+        name: "VIP-Deaf", 
+
+        icon: "🧏", 
+
+        bio: "A retired judge. He sits perfectly still, staring ahead. UNLESS THE USER SPEAKS IN ALL CAPS, HE JUST YELLS 'WHAT?!'", 
+
+        secret: "I HEARD A LOUD THUD AROUND MIDNIGHT, BUT I COULDN'T TELL WHERE IT CAME FROM. MY HEARING ISN'T WHAT IT USED TO BE.",
+
+        patienceVal: 10, patienceMax: 10
+
+    },
+
+    { 
+
+        name: "VIP-Stammer", 
+
+        icon: "😰", 
+
+        bio: "A high-stakes gambler who has lost everything tonight. He's shaking and sweating profusely.", 
+
+        secret: "The m-m-merger! If my name is tied to a murder investigation, the stocks will crash and my board of directors will ruin me. I saw a shadow in the hall, but I can't be involved!",
+
+        patienceVal: 6, patienceMax: 6
+
+    },
+
+    { 
+
+        name: "Manager", 
+
+        icon: "💼", 
+
+        bio: "Deeply in debt to the House. He needs this case closed quietly and quickly to avoid a scandal.", 
+
+        secret: "The PD was ready to call it a heart attack before you showed up. Why can't you just sign the report so we can reopen the floor?",
+
+        patienceVal: 5, patienceMax: 5
+
+    },
+
+    { 
+
         name: "PA-Viktor", 
+
         icon: "👔", 
-        bio: "Junior assistant. Terrified.", 
-        secret: "Julian is too calm. Cold as ice.",
-        patienceVal: 6,
-        patienceMax: 6
+
+        bio: "A junior assistant who is visibly shaking. He looks like he's about to be sick and refuses to look anywhere near the crime scene.", 
+
+        secret: "I... I don't know anything. I was just getting coffee when the lights went out. I'm just an assistant, please don't arrest me.",
+
+        patienceVal: 6, patienceMax: 6
+
     },
+
     { 
+
         name: "PA-Jax", 
+
         icon: "🧥", 
-        bio: "Security minded. Always recording.", 
-        secret: "I saw someone in a lab coat. Julian's coat.",
-        patienceVal: 5,
-        patienceMax: 5
+
+        bio: "A quiet assistant who has gone completely pale. He's staring at a fixed point on the wall, paralyzed by the situation.", 
+
+        secret: "I didn't see anything. I was just standing by the door. Everything happened so fast. I just want this to be over.",
+
+        patienceVal: 5, patienceMax: 5
+
     }
 ];
 

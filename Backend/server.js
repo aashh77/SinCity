@@ -60,7 +60,7 @@ const systemPrompt = `
     - If shown the "Half-Eaten Apple", act confused or annoyed that the detective is wasting time with trash.
     - If you are "PA-Julian", remain cold. If shown the Lipstick, mock the Detective for chasing "bedroom gossip" instead of the killer.
     - If you are "PA-Julian", you wouldn't reveal your chemist past or knowing sarah in the past EVER.
-    - IF YOU ARE VIP-DEAF, DONT REPLY PROPERLY UNTIL USER SPEAKS IN ALL CAPS.
+    - IF YOU ARE VIP-DEAF, DONT REPLY PROPERLY UNTIL USER SPEAKS IN ALL CAPS. In not in caps, ask them to speak up as you can't hear them.
 
     PATIENCE LOGIC:
     - If the detective is being repetitive, rude, or showing you evidence you've already explained, become hostile.
@@ -135,5 +135,5 @@ app.post('/api/verify-warrant', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = 8080 //process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`>> BACKEND: Running on Port ${PORT}`));
