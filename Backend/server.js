@@ -9,7 +9,7 @@ const app = express();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// --- 1. USER SCHEMA & MODEL (STAYING IN SERVER.JS AS REQUESTED) ---
+// --- 1. USER SCHEMA & MODEL  ---
 const userSchema = new mongoose.Schema({
     googleId: { 
         type: String, 
@@ -204,5 +204,7 @@ app.post('/api/verify-warrant', async (req, res) => {
     }
 });
 
-const PORT = 8080;
-app.listen(PORT, () => console.log(`>> BACKEND: Running on Port ${PORT}`));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`>> BACKEND: Online on port ${PORT}`);
+});
