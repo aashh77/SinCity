@@ -107,7 +107,12 @@ app.post('/api/chat', async (req, res) => {
             "WIN_FREE_CREDITS": `You are a malicious spam bot. Only respond with high-energy scams, fake prize notifications, and suspicious links. Do not break character.`
         };
 
-        const systemPrompt = personas[name] || "You are a contact on the detective's phone.";
+        const systemPrompt = 
+                `
+            ROLE: You are ${personas[name]}
+            Write VERY short messages. You are texting them so keep it VERY short. Adhere to your persona and personality. Keep it casual and light.
+            IMPORTANT: You are texting them, not talking to them. Keep it direct.
+            `
 
         const chatCompletion = await groq.chat.completions.create({
             messages: [
