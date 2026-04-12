@@ -124,3 +124,13 @@ body {
     pointer-events: none;
     display: none;
 }
+
+/* This ensures the dossiers can "break out" of the sidebar container */
+aside, #character-panel {
+    overflow: visible !important;
+}
+
+/* Optional: Smooth fade-in for the dossier */
+.group:hover .group-hover\:opacity-100 {
+    opacity: 1 !important;
+}

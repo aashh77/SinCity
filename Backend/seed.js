@@ -7,7 +7,7 @@ const subjects = [
 
     { 
 
-        name: "PA-Julian", 
+        name: "Julian Vane", // Formerly PA-Julian 
 
         icon: "🧪", 
 
@@ -23,7 +23,7 @@ const subjects = [
 
     { 
 
-        name: "Elena", 
+        name: "Elena Rossi", // Formerly Elena
 
         icon: "🧹", 
 
@@ -39,7 +39,7 @@ const subjects = [
 
     { 
 
-        name: "VIP-Arrogant", 
+        name: "Lady Sterling", // Formerly VIP-Arrogant
 
         icon: "💎", 
 
@@ -53,7 +53,7 @@ const subjects = [
 
     { 
 
-        name: "Guard", 
+        name: "Marcus Thorne", // Formerly Guard
 
         icon: "🛡️", 
 
@@ -67,7 +67,7 @@ const subjects = [
 
     { 
 
-        name: "VIP-Deaf", 
+        name: "Judge Halloway", // Formerly VIP-Deaf
 
         icon: "🧏", 
 
@@ -81,7 +81,7 @@ const subjects = [
 
     { 
 
-        name: "VIP-Stammer", 
+        name: "Arthur Penhaligon", // Formerly VIP-Stammer
 
         icon: "😰", 
 
@@ -95,7 +95,7 @@ const subjects = [
 
     { 
 
-        name: "Manager", 
+        name: "Manager Silas", // Formerly Manager
 
         icon: "💼", 
 
@@ -109,7 +109,7 @@ const subjects = [
 
     { 
 
-        name: "PA-Viktor", 
+        name: "Viktor Kross", // Formerly PA-Viktor
 
         icon: "👔", 
 
@@ -123,7 +123,7 @@ const subjects = [
 
     { 
 
-        name: "PA-Jax", 
+        name: "Jax Miller", // Formerly PA-Jax
 
         icon: "🧥", 
 
