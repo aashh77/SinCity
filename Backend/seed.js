@@ -71,7 +71,7 @@ const subjects = [
 
         icon: "🧏", 
 
-        bio: "A retired judge. He sits perfectly still, staring ahead. Hard of hearing. A VIP.", 
+        bio: "A retired judge. Calm, but wants justice. Hard of hearing. A VIP.", 
 
         secret: "Can't really hear, but doesn't admit it. Doesn't answer the question unless asked in ALL CAPS.",
 
