@@ -728,10 +728,8 @@ UI.showSlotMachine = function() {
     document.getElementById('slot-machine-ui').classList.remove('hidden');
     
     // Set spins based on the result stored in window
-    const outcome = window.lastGameOutcome || 'fail';
-    if (outcome === 'perfect') currentSpins = 10;
-    else if (outcome === 'partial') currentSpins = 3;
-    else currentSpins = 1;
+    const outcome = window.lastGameOutcome; 
+    currentSpins = (outcome === 'perfect') ? 10 : 1;
     
     document.getElementById('spin-count').innerText = currentSpins;
 };
