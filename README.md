@@ -5,9 +5,9 @@ SinCity Investigator is an immersive, AI-powered detective experience. Built for
 
 **🔗 Live Case Access**
 The investigation is live and optimized for high-performance terminal interaction:
-    🌐 Live Investigation (Frontend): [Insert your Vercel URL here]
-    ⚙️ Neural Link (Backend API): [Insert your Render URL here]
-    📂 Case Files (Source Code): https://github.com/aashh77/SinCity.git
+    1. **🌐 Live Investigation (Frontend):** [Insert your Vercel URL here]
+    2. **⚙️ Neural Link (Backend API):** [Insert your Render URL here]
+    3. **📂 Case Files (Source Code):** https://github.com/aashh77/SinCity.git
 
 ## 📝 Problem Statement
 Traditional narrative games rely on rigid branching paths and "point-and-click" simplicity. SinCity Investigator redefines the genre by introducing Dynamic Interrogation.
