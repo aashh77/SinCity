@@ -10,7 +10,11 @@ const app = express();
 // 2. Initialize Groq with your API Key from .env
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-app.use(cors());
+app.use(cors({
+    origin: '*', // Allow all origins for the hackathon demo
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI)
@@ -135,5 +139,6 @@ app.post('/api/verify-warrant', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 5000;
+
+const PORT = 8080; // Changed from 5000
 app.listen(PORT, () => console.log(`>> BACKEND: Running on Port ${PORT}`));

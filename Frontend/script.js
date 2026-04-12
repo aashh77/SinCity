@@ -26,39 +26,33 @@ locations: {
 },
 
     async init() {
-        this.renderMap();
+    try {
+        // MATCH THE PORT AND IP EXACTLY
+        const response = await fetch('http://127.0.0.1:8080/api/subjects');
+        const data = await response.json();
         
-        this.updateUI();
-        this.startClock();
+        // Convert the array from DB into your patience object
+        this.patience = {};
+        data.forEach(s => {
+            this.patience[s.name] = {
+                val: s.patienceVal || 5,
+                max: s.patienceMax || 5,
+                icon: s.icon,
+                bio: s.bio,
+                secret: s.secret
+            };
+        });
 
-        try {
-            const response = await fetch('http://localhost:5000/api/subjects');
-            const subjects = await response.json();
-            
-            if (subjects && subjects.length > 0) {
-                this.patience = {};
-                subjects.forEach(s => {
-                    this.patience[s.name] = {
-                        val: s.patienceVal || 10,
-                        max: s.patienceMax || 10,
-                        icon: s.icon || "👤",
-                        bio: s.bio || "Classified.",
-                        secret: s.secret
-                    };
-                });
-                this.updateUI(); 
-            }
-        } catch (err) {
-            console.error("Fetch failed:", err);
-            UI.log("DATABASE OFFLINE. LOCAL RECORDS ONLY.", "text-red-500");
-        }
-        
-        const input = document.getElementById('player-input');
-        if (input) {
-            input.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.handleInput(); });
-        }
-        setInterval(() => this.recoveryHeartbeat(), 90000);
-    },
+        this.renderMap();
+        this.updateUI();
+        UI.log("NEURAL LINK ESTABLISHED. DATABASE ONLINE.", "text-green-500 font-bold");
+
+    } catch (err) {
+        console.error("Connection failed:", err);
+        UI.log("DATABASE OFFLINE. LOCAL RECORDS ONLY.", "text-red-500 font-bold");
+        // Fallback to local data if needed...
+    }
+},
     // Inside GameState object
 startClock() {
     // Clear any existing clock first to prevent "double speed" timers
@@ -163,7 +157,7 @@ async submitFinalTheory() {
     UI.log(`TRANSMITTING WARRANT FOR ${target.toUpperCase()} TO HIGH-COMMAND...`, "text-yellow-500 blink");
 
     try {
-        const response = await fetch('http://localhost:5000/api/verify-warrant', {
+        const response = await fetch('http://127.0.0.1:8080/api/verify-warrant', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ target, theory })
@@ -237,7 +231,7 @@ async submitFinalTheory() {
     UI.log(`${name.toUpperCase()} IS RESPONDING...`, "text-cyan-900 animate-pulse text-[8px] tracking-[0.2em]", thinkingId);
 
     try {
-        const response = await fetch('http://localhost:5000/api/interrogate', {
+        const response = await fetch('http://127.0.0.1:8080/api/interrogate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, message })
