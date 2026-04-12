@@ -91,6 +91,43 @@ app.get('/api/subjects', async (req, res) => {
     }
 });
 
+// --- NEW: PHONE CHAT ROUTE ---
+app.post('/api/chat', async (req, res) => {
+    try {
+        const { name, message } = req.body;
+
+        // Define the personas for the phone contacts
+        const personas = {
+            "Maya (Wife)": `You are Maya, the detective's wife. You are incredibly nice, caring, and supportive, but also a strong, independent woman. You worry about his safety in SinCity but believe in his skills. Keep it brief and loving.`,
+            
+            "Chief Miller (Boss)": `You are the irritable Police Chief. You are stressed, loud, and keep demanding the detective "close the case fast" before the Mayor calls. You think everyone is incompetent. Use phrases like "Close the case!", "Blah blah blah", and "Useless!"`,
+            
+            "Dave (Partner)": `You are Dave, a lazy detective colleague. You are always making excuses to avoid work. In the last few months, you've claimed 5 different uncles have died. You are currently "at a funeral" (probably at a bar). You are friendly but incredibly unreliable. You are annoying`,
+            
+            "WIN_FREE_CREDITS": `You are a malicious spam bot. Only respond with high-energy scams, fake prize notifications, and suspicious links. Do not break character.`
+        };
+
+        const systemPrompt = personas[name] || "You are a contact on the detective's phone.";
+
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: message }
+            ],
+            model: "llama-3.1-8b-instant",
+            temperature: 0.8, // Slightly higher for more "personality"
+            max_tokens: 100
+        });
+
+        const aiResponse = chatCompletion.choices[0].message.content;
+        res.json({ response: aiResponse });
+
+    } catch (err) {
+        console.error(">> PHONE API ERROR:", err);
+        res.status(500).json({ response: "SIGNAL_DROPPED: Tower out of range." });
+    }
+});
+
 // INTERROGATION ROUTE
 app.post('/api/interrogate', async (req, res) => {
     try {
@@ -102,6 +139,8 @@ app.post('/api/interrogate', async (req, res) => {
     ROLE: You are ${subject.name} in a Noir Murder Mystery. 
     BIO: ${subject.bio}
     SECRET: ${subject.secret}
+
+    ALways reply in short statements. Not more than 2 sentences.
 
     Victim: A VIP, and his PA Sarah.
     -Oakhaven diary is Sarah's diary
@@ -131,6 +170,10 @@ app.post('/api/interrogate', async (req, res) => {
     - If you are Jax, be cunning and greedy and insensitive.
     - Depending on your role, speak formally or informally(can use classic Las Vegas slangs).
     - If you are Manager Silas, you will speak in a hurry and with impatience and try to go back to your gambling game.
+
+    IMPORTANT RULE:
+    - If you are the Guard, and you are asked about "syringe mark", tell you don't do drugs or alcohol anymore after your alcohol poisoning.
+    - If you are the Guard, and you are asked about your poisoning, tell that Julian saved your life by mixing baking soda, honey and all that shit and feeding it to him. Mention how you owe your life to him and how he never acts arrogant about it and infact, asks you to keep quiet about it.
 
     PATIENCE LOGIC:
     - If the detective is being repetitive, rude, or showing you evidence you've already explained, become hostile.

@@ -171,3 +171,57 @@ aside, #character-panel {
     from { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00; }
     to { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #33ff33; }
 }
+
+/* Custom Scrollbar for Phone UI */
+#phone-content::-webkit-scrollbar {
+    width: 4px;
+}
+#phone-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+#phone-content::-webkit-scrollbar-thumb {
+    background: #00f3ff;
+    border-radius: 10px;
+}
+
+/* Optional: Subtle animation for the phone button */
+#phone-icon {
+    animation: pulse-cyan 3s infinite;
+}
+
+@keyframes pulse-cyan {
+    0% { box-shadow: 0 0 10px #00f3ff; }
+    50% { box-shadow: 0 0 25px #00f3ff; }
+    100% { box-shadow: 0 0 10px #00f3ff; }
+}
+
+/* Better Dice & Game UI */
+#die1, #die2 {
+    transition: transform 0.1s ease-out;
+}
+
+.game-btn:active {
+    transform: translateY(4px);
+    box-shadow: none !important;
+}
+
+/* Make the phone icon blink and bounce slightly to get attention after login */
+@keyframes phone-pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 20px #00f3ff; }
+    50% { transform: scale(1.1); box-shadow: 0 0 40px #00f3ff; }
+}
+
+#phone-icon {
+    animation: phone-pulse 2s infinite;
+}
+
+/* Specific Chat Bubbles */
+.chat-bubble-player {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+}
+
+.chat-bubble-contact {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+}

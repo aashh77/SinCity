@@ -159,7 +159,7 @@
                 const user = result.user;
 
                 // 1. Sync user data with MongoDB Backend
-                const syncResponse = await fetch('http://127.0.0.1:8080/api/user-sync', {
+                const syncResponse = await fetch('https://sin-city.onrender.com/api/user-sync', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -192,6 +192,7 @@
                     window.GameState.playerStats = dbUser.stats;
                     await window.GameState.init();
                 }
+                
 
                 window.UI.log(`WELCOME, DET. ${user.displayName.toUpperCase()}. Records retrieved! Database ONLINE!`, "text-cyan-400 font-bold");
                 

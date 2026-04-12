@@ -42,9 +42,12 @@ const GameState = {
         this.updateUI();
         this.startClock();
         this.startTime = Date.now(); // TRACK START TIME
+        if (window.PhoneSystem) {
+            window.PhoneSystem.init();
+        }
 
         try {
-            const response = await fetch('http://127.0.0.1:8080/api/subjects');
+            const response = await fetch('https://sin-city.onrender.com/api/subjects');
             const subjects = await response.json();
             
             if (subjects && subjects.length > 0) {
@@ -119,7 +122,7 @@ const GameState = {
         const secondsPlayed = Math.floor((Date.now() - this.startTime) / 1000);
 
         if (this.googleId) {
-            fetch('http://127.0.0.1:8080/api/update-stats', {
+            fetch('https://sin-city.onrender.com/api/update-stats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -183,7 +186,7 @@ const GameState = {
         UI.log(`TRANSMITTING WARRANT FOR ${target.toUpperCase()}...`, "text-yellow-500 blink");
 
         try {
-            const response = await fetch('http://127.0.0.1:8080/api/verify-warrant', {
+            const response = await fetch('https://sin-city.onrender.com/api/verify-warrant', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ target, theory })
@@ -247,7 +250,7 @@ const GameState = {
         UI.log(`${name.toUpperCase()} IS RESPONDING...`, "text-cyan-900 animate-pulse text-[8px]", thinkingId);
 
         try {
-            const response = await fetch('http://127.0.0.1:8080/api/interrogate', {
+            const response = await fetch('https://sin-city.onrender.com/api/interrogate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, message })
@@ -400,7 +403,7 @@ async function handleGoogleLogin(response) {
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const payload = JSON.parse(window.atob(base64));
 
-    const res = await fetch('http://127.0.0.1:8080/api/user-sync', {
+    const res = await fetch('https://sin-city.onrender.com/api/user-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -477,6 +480,216 @@ const UI = {
         modal.classList.toggle('hidden');
     }
 };
+const PhoneSystem = {
+    contacts: {
+        wife: { name: "Maya (Wife)", messages: ["Stay safe out there!", "Don't overwork yourself, yeah?"] },
+        boss: { name: "Chief Miller (Boss)", messages: ["WHERE IS THE DAMN REPORT?", "Close the case fast! Useless!"] },
+        colleague: { name: "Dave (Partner)", messages: ["Uncle #5 just passed away.", "Another funeral... crazyyyy, right?"] },
+        spam: { name: "WIN_FREE_CREDITS", messages: ["CONGRATS! YOU WON A NEW HOVER-CAR!", "CLICK HERE TO CLAIM"] }
+    },
+
+    hints: [
+        "SECRET INTEL: Someone is lying. About everything. How do we find their real identity?",
+        "SECRET INTEL: A shock? That's a weird way to trigger a heart attack with no previous heart ailments. "
+        
+    ],
+
+    init() {
+        if (document.getElementById('phone-icon')) return;
+
+        const btn = document.createElement('div');
+        btn.id = 'phone-icon';
+        btn.className = 'fixed bottom-8 left-8 w-20 h-20 bg-cyan-500 rounded-full flex items-center justify-center cursor-pointer shadow-[0_0_30px_#00f3ff] z-[4000] hover:scale-110 transition-all text-4xl border-4 border-white/20';
+        btn.innerHTML = '📱';
+        btn.onclick = () => this.togglePhone();
+        document.body.appendChild(btn);
+
+        const modal = document.createElement('div');
+        modal.id = 'phone-modal';
+        modal.className = 'hidden fixed bottom-32 left-8 w-80 h-[600px] bg-slate-950 border-2 border-cyan-500/50 rounded-[3rem] z-[4000] flex flex-col overflow-hidden shadow-[0_0_80px_rgba(0,243,255,0.2)] font-mono border-t-[14px] border-x-[8px] border-b-[14px] border-slate-900';
+        modal.innerHTML = `
+            <div class="h-6 w-32 bg-slate-900 absolute top-0 left-1/2 -translate-x-1/2 rounded-b-xl z-[4001]"></div>
+            <div class="bg-slate-950 p-6 pt-10 flex justify-between items-center border-b border-cyan-500/20">
+                <button id="phone-back-btn" class="invisible text-cyan-500 text-[10px] font-black" onclick="PhoneSystem.showHomeScreen()"> < EXIT </button>
+                <span id="phone-header-title" class="text-cyan-400 font-black text-[10px] tracking-widest">SINCITY_OS</span>
+                <span class="text-cyan-400 text-[8px] opacity-50">5G</span>
+            </div>
+            <div id="phone-content" class="flex-grow overflow-y-auto p-4 bg-slate-950"></div>
+            <div id="phone-input-area" class="hidden p-4 bg-slate-900/80 backdrop-blur-md border-t border-cyan-500/10">
+                <div class="flex gap-2">
+                    <input type="text" id="phone-user-input" placeholder="Message..." class="flex-grow bg-black border border-cyan-500/30 p-2 text-[10px] text-cyan-400 outline-none rounded">
+                    <button onclick="PhoneSystem.sendMessage()" class="bg-cyan-500 text-black px-3 py-1 text-[10px] font-black rounded">SEND</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // --- FIXED ENTER KEY LOGIC ---
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const phoneInput = document.getElementById('phone-user-input');
+                // Check if the phone input is the one being typed in
+                if (document.activeElement === phoneInput) {
+                    this.sendMessage();
+                }
+            }
+        });
+
+        this.showHomeScreen();
+    },
+
+    togglePhone() {
+        const modal = document.getElementById('phone-modal');
+        modal.classList.toggle('hidden');
+    },
+
+    showHomeScreen() {
+        this.activeContactKey = null;
+        document.getElementById('phone-back-btn').classList.add('invisible');
+        document.getElementById('phone-input-area').classList.add('hidden');
+        document.getElementById('phone-header-title').innerText = "HOME";
+        const container = document.getElementById('phone-content');
+        container.innerHTML = `
+            <div class="flex flex-col gap-6 p-4 mt-10">
+                <div onclick="PhoneSystem.showContactList()" class="flex items-center gap-4 p-5 bg-slate-900/50 border border-cyan-500/20 rounded-2xl cursor-pointer hover:bg-cyan-500/10 group">
+                    <div class="w-14 h-14 bg-cyan-500 rounded-xl flex items-center justify-center text-3xl shadow-[0_0_15px_#00f3ff]">💬</div>
+                    <div>
+                        <p class="text-white font-black text-xs">MESSAGES</p>
+                        <p class="text-cyan-700 text-[8px]">ENCRYPTED CHATS</p>
+                    </div>
+                </div>
+                <div onclick="PhoneSystem.openGame()" class="flex items-center gap-4 p-5 bg-slate-900/50 border border-yellow-500/20 rounded-2xl cursor-pointer hover:bg-yellow-500/10 group">
+                    <div class="w-14 h-14 bg-yellow-500 rounded-xl flex items-center justify-center text-3xl shadow-[0_0_15px_#eab308]">🎲</div>
+                    <div>
+                        <p class="text-white font-black text-xs">7 UP 7 DOWN</p>
+                        <p class="text-yellow-700 text-[8px]">UNDERGROUND CASINO</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    showContactList() {
+        document.getElementById('phone-back-btn').classList.remove('invisible');
+        document.getElementById('phone-header-title').innerText = "CHATS";
+        const container = document.getElementById('phone-content');
+        container.innerHTML = Object.keys(this.contacts).map(key => `
+            <div onclick="PhoneSystem.openChat('${key}')" class="p-4 mb-3 bg-slate-900/80 border-l-4 border-cyan-500 rounded-r-lg cursor-pointer">
+                <p class="text-cyan-400 font-black text-xs uppercase">${this.contacts[key].name}</p>
+                <p class="text-[9px] text-slate-500 truncate">${this.contacts[key].messages[this.contacts[key].messages.length-1]}</p>
+            </div>
+        `).join('');
+    },
+
+    openGame() {
+        document.getElementById('phone-back-btn').classList.remove('invisible');
+        document.getElementById('phone-header-title').innerText = "CASINO";
+        const container = document.getElementById('phone-content');
+        container.innerHTML = `
+            <div class="flex flex-col items-center p-2">
+                <div class="w-full text-center py-4 bg-yellow-500/10 rounded-xl border border-yellow-500/30 mb-8">
+                    <p class="text-yellow-500 font-black text-[10px] tracking-widest">ROLL THE BONES</p>
+                </div>
+                <div class="flex gap-6 mb-12">
+                    <div id="die1" class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl text-black shadow-[0_10px_0_#cbd5e1] font-black border-2 border-slate-300">?</div>
+                    <div id="die2" class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl text-black shadow-[0_10px_0_#cbd5e1] font-black border-2 border-slate-300">?</div>
+                </div>
+                <div class="grid w-full gap-3">
+                    <button onclick="PhoneSystem.playGame('down')" class="game-btn border-2 border-blue-500 p-3 text-blue-500 text-[10px] font-black rounded-lg uppercase">7 Down (2-6)</button>
+                    <button onclick="PhoneSystem.playGame('seven')" class="game-btn border-2 border-yellow-500 p-3 text-yellow-500 text-[10px] font-black rounded-lg uppercase">Lucky 7</button>
+                    <button onclick="PhoneSystem.playGame('up')" class="game-btn border-2 border-green-500 p-3 text-green-500 text-[10px] font-black rounded-lg uppercase">7 Up (8-12)</button>
+                </div>
+                <div id="game-status" class="mt-8 text-[10px] text-center font-bold h-10"></div>
+            </div>
+        `;
+    },
+
+    playGame(choice) {
+        const d1 = document.getElementById('die1');
+        const d2 = document.getElementById('die2');
+        const status = document.getElementById('game-status');
+        const btns = document.querySelectorAll('.game-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        status.innerHTML = `<span class="text-cyan-400 animate-pulse">ROLLING...</span>`;
+        let count = 0;
+        const roll = setInterval(() => {
+            d1.innerText = Math.floor(Math.random()*6)+1;
+            d2.innerText = Math.floor(Math.random()*6)+1;
+            d1.style.transform = `rotate(${Math.random()*10-5}deg)`;
+            d2.style.transform = `rotate(${Math.random()*10-5}deg)`;
+            count++;
+            if(count > 15) {
+                clearInterval(roll);
+                this.finishGame(choice, d1, d2, status, btns);
+            }
+        }, 80);
+    },
+
+    finishGame(choice, d1, d2, status, btns) {
+        const win = Math.random() < 0.30;
+        let r1, r2, total;
+        if (win) {
+            if (choice === 'down') { r1=1; r2=2; } else if (choice === 'up') { r1=5; r2=5; } else { r1=3; r2=4; }
+            status.innerHTML = `<span class="text-green-500 uppercase">${this.hints[Math.floor(Math.random()*this.hints.length)]}</span>`;
+            UI.log("GAMBLE WIN: INTEL RETRIEVED", "text-green-500");
+        } else {
+            if (choice === 'down') { r1=5; r2=6; } else { r1=1; r2=2; }
+            GameState.time -= 10;
+            GameState.updateUI();
+            status.innerHTML = `<span class="text-red-500 uppercase">LOST. -10 MINS PENALTY</span>`;
+            UI.log("GAMBLE LOSS: -10 MINS", "text-red-600");
+        }
+        d1.innerText = r1; d2.innerText = r2;
+        d1.style.transform = d2.style.transform = 'none';
+        setTimeout(() => btns.forEach(b => b.disabled = false), 1000);
+    },
+
+    openChat(key) {
+        this.activeContactKey = key;
+        document.getElementById('phone-back-btn').classList.remove('invisible');
+        document.getElementById('phone-input-area').classList.remove('hidden');
+        document.getElementById('phone-header-title').innerText = this.contacts[key].name.toUpperCase();
+        this.renderMessages();
+    },
+
+    renderMessages() {
+        const contact = this.contacts[this.activeContactKey];
+        const container = document.getElementById('phone-content');
+        container.innerHTML = contact.messages.map(msg => {
+            const isPlayer = msg.startsWith("YOU:");
+            return `<div class="mb-4 flex ${isPlayer ? 'justify-end' : 'justify-start'}">
+                <div class="${isPlayer ? 'bg-cyan-500 text-black' : 'bg-slate-900 border border-cyan-500/20 text-white'} p-3 rounded-xl text-[10px] max-w-[80%] font-bold">
+                    ${msg.replace("YOU:", "")}
+                </div>
+            </div>`;
+        }).join('');
+        container.scrollTop = container.scrollHeight;
+    },
+
+    async sendMessage() {
+        const input = document.getElementById('phone-user-input');
+        const text = input.value.trim();
+        if (!text) return;
+        this.contacts[this.activeContactKey].messages.push(`YOU: ${text}`);
+        this.renderMessages();
+        input.value = "";
+        try {
+            const res = await fetch('https://sin-city.onrender.com/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: this.contacts[this.activeContactKey].name, message: text })
+            });
+            const data = await res.json();
+            this.contacts[this.activeContactKey].messages.push(data.response);
+            this.renderMessages();
+        } catch (e) { console.error(e); }
+    }
+};
+
+window.PhoneSystem = PhoneSystem;
+
+
 
 window.GameState = GameState;
 window.UI = UI;
