@@ -11,9 +11,9 @@ const subjects = [
 
         icon: "🧪", 
 
-        bio: "An expert in synthetic toxins. Speaks with terrifying, clinical precision. He seems far too calm for a double homicide scene. However, he strongly hides his past as a chemist, and pretends to be just a PA.", 
+        bio: "An expert in his field. Speaks with terrifying, clinical precision. He seems far too calm for a double homicide scene. Judge Halloway's PA.", 
 
-        secret: "Elias didn't die in that prison transport, Detective. He just found a better suit. Sarah was a loose end from Oakhaven that had to be cut.",
+        secret: "However, he strongly hides his past as a chemist, and pretends to be just a PA. Sarah's killing was revenge.",
 
         patienceVal: 5,
 
@@ -43,9 +43,9 @@ const subjects = [
 
         icon: "💎", 
 
-        bio: "Old money with a sharp tongue. She seems more worried about her reputation than the dead bodies in the suite.", 
+        bio: "Old money with a sharp tongue. She seems more worried about her reputation than the dead bodies in the suite. A VIP.", 
 
-        secret: "If the papers find out I was with the Guard, I'm finished. My husband would have me in the streets by morning.",
+        secret: "Hides her affair with Marcus Thorne, the guard. If it comes out, it would be scandalous.",
 
         patienceVal: 4, patienceMax: 4
 
@@ -57,9 +57,9 @@ const subjects = [
 
         icon: "🛡️", 
 
-        bio: "Former military. He has a nervous facial tic and keeps checking the hallway cameras with trembling hands.", 
+        bio: "Former military. He has a nervous facial tic and keeps checking the hallway cameras with trembling hands. THe guard.", 
 
-        secret: "I abandoned my post for a few minutes. If the Floor Manager finds out the VIP suite was unguarded on my watch, I'm done.",
+        secret: "He abandoned his post for a few minutes. If the Floor Manager finds out, he's done. In an affair with Lady Sterling.",
 
         patienceVal: 8, patienceMax: 8
 
@@ -71,9 +71,9 @@ const subjects = [
 
         icon: "🧏", 
 
-        bio: "A retired judge. He sits perfectly still, staring ahead. UNLESS THE USER SPEAKS IN ALL CAPS, HE JUST YELLS 'WHAT?!'", 
+        bio: "A retired judge. He sits perfectly still, staring ahead. Hard of hearing. A VIP.", 
 
-        secret: "I HEARD A LOUD THUD AROUND MIDNIGHT, BUT I COULDN'T TELL WHERE IT CAME FROM. MY HEARING ISN'T WHAT IT USED TO BE.",
+        secret: "Can't really hear, but doesn't admit it. Doesn't answer the question unless asked in ALL CAPS.",
 
         patienceVal: 10, patienceMax: 10
 
@@ -85,9 +85,9 @@ const subjects = [
 
         icon: "😰", 
 
-        bio: "A high-stakes gambler who has lost everything tonight. He's shaking and sweating profusely.", 
+        bio: "A high-stakes gambler who has lost everything tonight. He's shaking and sweating profusely. A VIP", 
 
-        secret: "The m-m-merger! If my name is tied to a murder investigation, the stocks will crash and my board of directors will ruin me. I saw a shadow in the hall, but I can't be involved!",
+        secret: "The m-m-merger! If my name is tied to a murder investigation, the stocks will crash and my board of directors will ruin me. I saw a shadow in the hall, but I can't be involved! He stammers.",
 
         patienceVal: 6, patienceMax: 6
 
@@ -101,7 +101,7 @@ const subjects = [
 
         bio: "Deeply in debt to the House. He needs this case closed quietly and quickly to avoid a scandal.", 
 
-        secret: "The PD was ready to call it a heart attack before you showed up. Why can't you just sign the report so we can reopen the floor?",
+        secret: "This is getting stretched out for no reason. Why can't you just sign the report so we can reopen the floor?",
 
         patienceVal: 5, patienceMax: 5
 
@@ -113,9 +113,9 @@ const subjects = [
 
         icon: "👔", 
 
-        bio: "A junior assistant who is visibly shaking. He looks like he's about to be sick and refuses to look anywhere near the crime scene.", 
+        bio: "A junior assistant who is visibly shaking. He looks like he's about to be sick and refuses to look anywhere near the crime scene. PA of Lady Sterling", 
 
-        secret: "I... I don't know anything. I was just getting coffee when the lights went out. I'm just an assistant, please don't arrest me.",
+        secret: "Terrified. What is he is killed? What if he is fired? What if he is falsely arrested!",
 
         patienceVal: 6, patienceMax: 6
 
@@ -129,7 +129,7 @@ const subjects = [
 
         bio: "Greedy. Is already thinking of ways to turn this into a publicity stunt or a money making event for his boss.", 
 
-        secret: "I don't care. It doesn't matter to me.",
+        secret: "Doesn't care about the murder. Very insensitive to it",
 
         patienceVal: 5, patienceMax: 5
 
