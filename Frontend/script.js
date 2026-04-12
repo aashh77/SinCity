@@ -388,7 +388,7 @@ const GameState = {
         this.currentTarget = null;
         this.updateUI();
         this.renderMap();
-        UI.log(`RELOCATED TO ${loc.toUpperCase()}. (-15 MINS TRAVEL)`, "text-red-400 italic");
+        UI.log(`RELOCATED TO ${loc.toUpperCase()}. (-15 MINS TRAVEL). The air smells of luxury.`, "text-red-400 italic");
         if (this.time <= 0) this.gameOver("LOSS", "Time expired during travel.");
     }
 };
