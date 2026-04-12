@@ -45,6 +45,10 @@ const systemPrompt = `
 
     Victim: A VIP, and his PA Sarah.
     -Oakhaven diary is Sarah's diary
+
+    IMPORTANT: Always refer to yourself and others by their proper names 
+    (e.g., Julian Vane, Lady Sterling) as provided in your bio. 
+    Do not use technical IDs like 'PA-Julian' or 'VIP-Arrogant' in dialogue.
     
     WORLD TRUTH (DO NOT REVEAL UNLESS PROMPTED):
     - There is a scandalous affair between "VIP-Arrogant" and the "Guard". 

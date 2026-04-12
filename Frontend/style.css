@@ -134,3 +134,40 @@ aside, #character-panel {
 .group:hover .group-hover\:opacity-100 {
     opacity: 1 !important;
 }
+
+/* Apply this to the Status Terminated header */
+.neon-text-red {
+    color: #ff0000; /* Pure red */
+    font-weight: 900;
+    text-transform: uppercase;
+    text-shadow: 
+        0 0 5px #ff0000, 
+        0 0 10px #ff0000, 
+        0 0 20px #ff0000, 
+        0 0 40px #ff3333; /* Slightly lighter red for the outer glow */
+    animation: neon-pulse-red 1.5s ease-in-out infinite alternate;
+}
+
+/* Apply this to the Case Closed header */
+.neon-text-green {
+    color: #00ff00; /* Pure green */
+    font-weight: 900;
+    text-transform: uppercase;
+    text-shadow: 
+        0 0 5px #00ff00, 
+        0 0 10px #00ff00, 
+        0 0 20px #00ff00, 
+        0 0 40px #33ff33; /* Lighter green for outer glow */
+    animation: neon-pulse-green 1.5s ease-in-out infinite alternate;
+}
+
+/* Optional: Add a flickering pulse animation for extra effect */
+@keyframes neon-pulse-red {
+    from { text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000, 0 0 20px #ff0000; }
+    to { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff3333; }
+}
+
+@keyframes neon-pulse-green {
+    from { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00; }
+    to { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #33ff33; }
+}

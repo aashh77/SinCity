@@ -84,17 +84,17 @@ const GameState = {
         document.getElementById('player-input').disabled = true;
 
         const endData = {
-            WIN: {
-                header: "CASE_CLOSED",
-                headerClass: "text-green-500 shadow-[0_0_30px_#00ff00] font-black",
-                image: "https://images.unsplash.com/photo-1598048145802-58e1b1d44093?q=80&w=600"
-            },
-            LOSS: {
-                header: "STATUS_TERMINATED",
-                headerClass: "text-red-600 shadow-[0_0_30px_#ff0000] font-black",
-                image: "https://images.unsplash.com/photo-1579783901586-d88db74b4fe1?q=80&w=600"
-            }
-        };
+    WIN: {
+        header: "CASE_CLOSED",
+        headerClass: "neon-text-green", // Matches the CSS class for green glow
+        image: "https://t4.ftcdn.net/jpg/04/39/31/31/360_F_439313135_MiYN3R98rCRl38t1NFNICJYs7rs55dqH.jpg"
+    },
+    LOSS: {
+        header: "STATUS_TERMINATED",
+        headerClass: "neon-text-red", // Matches the CSS class for red glow
+        image: "https://www.sydneycriminallawyers.com.au/app/uploads/2015/02/prison-escape-night.jpg"
+    }
+};
 
         const data = endData[type] || endData.LOSS;
         const screen = document.getElementById('end-screen');
