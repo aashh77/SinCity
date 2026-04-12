@@ -298,3 +298,10 @@ aside, #character-panel {
     50% { opacity: 0.8; }
     100% { opacity: 1; }
 }
+
+#spin-button:disabled {
+    filter: grayscale(1);
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+}

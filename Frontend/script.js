@@ -2,13 +2,12 @@ const GameState = {
     time: 1440,
     playerName: "Detective",
     currentLoc: "VIP Suite",
-    // Starting items
     inventory: ["Pocket Knife", "Post-Mortem Report", "Syringe Mark"],
     currentTarget: null,
     patience: {}, 
     startTime: null,
-    googleId: null, // Tracked from login
-    playerStats: null, // Tracked from login
+    googleId: null,
+    playerStats: null,
 
     evidenceMeta: { 
         "Pocket Knife": "🔪", 
@@ -41,7 +40,7 @@ const GameState = {
         this.renderMap();
         this.updateUI();
         this.startClock();
-        this.startTime = Date.now(); // TRACK START TIME
+        this.startTime = Date.now(); 
         if (window.PhoneSystem) {
             window.PhoneSystem.init();
         }
@@ -118,7 +117,7 @@ const GameState = {
             }, 1500);
         }
 
-        // --- STATS SYNC LOGIC ---
+
         const secondsPlayed = Math.floor((Date.now() - this.startTime) / 1000);
 
         if (this.googleId) {
@@ -146,7 +145,7 @@ const GameState = {
         }
 
         const query = input.value.trim().toLowerCase();
-        console.log("Database Query Received:", query); // Check your console (F12) for this!
+        console.log("Database Query Received:", query);
 
         if (!query) {
             display.innerHTML = `<p class="text-slate-500">> ENTER QUERY TO SEARCH...</p>`;
@@ -156,7 +155,7 @@ const GameState = {
         display.innerHTML = `<p class="animate-pulse text-cyan-700">> SEARCHING ARCHIVES...</p>`;
 
         setTimeout(() => {
-            // We use .includes() to make it more flexible
+            
             if (query.includes("sarah") || query.includes("oakhaven") || query.includes("elias")) {
                 display.innerHTML = `
                     <div class="border border-yellow-500/50 p-3 bg-yellow-950/20 rounded mb-2 animate-in fade-in duration-500">
@@ -399,7 +398,7 @@ const GameState = {
 
 // --- GOOGLE LOGIN HANDLER (OUTSIDE OBJECT) ---
 async function handleGoogleLogin(response) {
-    // Note: You need a helper to decode the JWT (like jwt-decode library or a simple split)
+    
     const base64Url = response.credential.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const payload = JSON.parse(window.atob(base64));
@@ -423,14 +422,14 @@ const avatar = document.getElementById('player-avatar');
 avatar.src = user.avatar;
 avatar.classList.remove('hidden');
     
-    // Store in GameState
+   
     GameState.googleId = user.googleId;
     GameState.playerStats = user.stats; 
     
     console.log("Logged in as:", user.displayName);
     UI.log(`WELCOME BACK, DETECTIVE ${user.displayName.toUpperCase()}`, "text-cyan-400 font-bold");
     
-    // Update basic UI stats if elements exist
+    
     if(document.getElementById('stat-name')) document.getElementById('stat-name').innerText = user.displayName;
 }
 
@@ -534,7 +533,7 @@ const PhoneSystem = {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const phoneInput = document.getElementById('phone-user-input');
-                // Check if the phone input is the one being typed in
+                
                 if (document.activeElement === phoneInput) {
                     this.sendMessage();
                 }
@@ -722,31 +721,37 @@ window.handleGoogleLogin = handleGoogleLogin;
 let currentSpins = 0;
 const icons = ['🕵️‍♂️', '🧪', '🚔', '💰'];
 
-// 1. Logic to show the button AFTER the AI finishes typing
+
 UI.showSlotMachine = function() {
     document.getElementById('claim-rewards-btn').classList.add('hidden');
     document.getElementById('slot-machine-ui').classList.remove('hidden');
     
-    // Set spins based on the result stored in window
+    
     const outcome = window.lastGameOutcome; 
     currentSpins = (outcome === 'perfect') ? 10 : 1;
     
     document.getElementById('spin-count').innerText = currentSpins;
 };
 
-// 2. Handle the spinning
+
 function handleSpinClick() {
-    if (currentSpins <= 0) return;
+    const spinBtn = document.getElementById('spin-button'); // Assuming your button has this ID
+    if (currentSpins <= 0 || spinBtn.disabled) return;
+    
+    // Disable button during animation
+    spinBtn.disabled = true;
     currentSpins--;
     document.getElementById('spin-count').innerText = currentSpins;
 
-    const forceWin = Math.random() < 0.8; // 80% Win chance for demo
+    const forceWin = Math.random() < 0.6; // 60% chance
     let results = forceWin ? 
         Array(3).fill(icons[Math.floor(Math.random() * icons.length)]) : 
-        [icons[0], icons[1], icons[2]];
+        [icons[0], icons[Math.floor(Math.random() * (icons.length-1)) + 1], icons[1]]; // Ensure variety for loss
 
     results.forEach((icon, i) => {
         const strip = document.getElementById(`strip${i + 1}`);
+        strip.classList.remove('is-spinning'); // Reset animation
+        void strip.offsetWidth; // Trigger reflow
         strip.classList.add('is-spinning');
         
         setTimeout(() => {
@@ -759,9 +764,14 @@ function handleSpinClick() {
                 
                 if (isWin) {
                     triggerJackpot();
-                } else if (currentSpins <= 0) {
-                    // 🎯 NO SPINS LEFT AND NO WIN
-                    handleFinalLoss();
+                } else {
+                    if (currentSpins <= 0) {
+                        handleFinalLoss();
+                    } else {
+                        // Re-enable button for next attempt
+                        spinBtn.disabled = false;
+                        UI.log(`NO LUCK. ${currentSpins} SPINS REMAINING.`, "text-slate-500");
+                    }
                 }
             }
         }, 1000 + (i * 400));
@@ -771,7 +781,7 @@ function handleSpinClick() {
 function triggerJackpot() {
     setTimeout(() => {
         const colors = ['#00f3ff', '#ff00ff', '#00ff00', '#ffff00', '#ff003c'];
-        const particleCount = 150;
+        const particleCount = 500;
 
         for (let i = 0; i < particleCount; i++) {
             const confetti = document.createElement('div');
