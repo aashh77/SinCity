@@ -6,12 +6,15 @@ const GameState = {
     inventory: ["Pocket Knife", "Post-Mortem Report", "Syringe Mark"],
     currentTarget: null,
     patience: {}, 
+    startTime: null,
+    googleId: null, // Tracked from login
+    playerStats: null, // Tracked from login
 
     evidenceMeta: { 
         "Pocket Knife": "🔪", 
         "Post-Mortem Report": "📄", 
         "Syringe Mark": "💉", 
-        "Sarah's Diary": "📓", // SYNCHRONIZED
+        "Sarah's Diary": "📓", 
         "Drug Database": "💾", 
         "Casino Ledger": "📊",
         "Gold Lipstick": "💄",
@@ -22,7 +25,7 @@ const GameState = {
     locations: {
         "VIP Suite": { 
             chars: ["Elena Rossi", "Julian Vane", "Lady Sterling"], 
-            clue: "Sarah's Diary" // SYNCHRONIZED
+            clue: "Sarah's Diary" 
         },
         "Main Floor": { 
             chars: ["Manager Silas", "Marcus Thorne", "Arthur Penhaligon"], 
@@ -38,6 +41,7 @@ const GameState = {
         this.renderMap();
         this.updateUI();
         this.startClock();
+        this.startTime = Date.now(); // TRACK START TIME
 
         try {
             const response = await fetch('http://127.0.0.1:8080/api/subjects');
@@ -84,17 +88,17 @@ const GameState = {
         document.getElementById('player-input').disabled = true;
 
         const endData = {
-    WIN: {
-        header: "CASE_CLOSED",
-        headerClass: "neon-text-green", // Matches the CSS class for green glow
-        image: "https://t4.ftcdn.net/jpg/04/39/31/31/360_F_439313135_MiYN3R98rCRl38t1NFNICJYs7rs55dqH.jpg"
-    },
-    LOSS: {
-        header: "STATUS_TERMINATED",
-        headerClass: "neon-text-red", // Matches the CSS class for red glow
-        image: "https://www.sydneycriminallawyers.com.au/app/uploads/2015/02/prison-escape-night.jpg"
-    }
-};
+            WIN: {
+                header: "CASE_CLOSED",
+                headerClass: "neon-text-green", 
+                image: "https://t4.ftcdn.net/jpg/04/39/31/31/360_F_439313135_MiYN3R98rCRl38t1NFNICJYs7rs55dqH.jpg"
+            },
+            LOSS: {
+                header: "STATUS_TERMINATED",
+                headerClass: "neon-text-red", 
+                image: "https://www.sydneycriminallawyers.com.au/app/uploads/2015/02/prison-escape-night.jpg"
+            }
+        };
 
         const data = endData[type] || endData.LOSS;
         const screen = document.getElementById('end-screen');
@@ -110,27 +114,58 @@ const GameState = {
                 UI.typeLogNarrative("end-ai-feedback", narrative);
             }, 1500);
         }
-    },
+
+        // --- STATS SYNC LOGIC ---
+        const secondsPlayed = Math.floor((Date.now() - this.startTime) / 1000);
+
+        if (this.googleId) {
+            fetch('http://127.0.0.1:8080/api/update-stats', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    googleId: this.googleId,
+                    result: type === "WIN" ? "wins" : "losses",
+                    timeSpent: secondsPlayed
+                })
+            }).then(r => r.json()).then(updated => {
+                console.log("Stats Recorded:", updated);
+            });
+        }
+    }, 
 
     openDatabase() {
         const input = document.getElementById('db-query-input');
         const display = document.getElementById('db-results');
+        
+        if (!input || !display) {
+            console.error("Critical UI elements missing for database.");
+            return;
+        }
+
         const query = input.value.trim().toLowerCase();
-        if (!query) return;
+        console.log("Database Query Received:", query); // Check your console (F12) for this!
+
+        if (!query) {
+            display.innerHTML = `<p class="text-slate-500">> ENTER QUERY TO SEARCH...</p>`;
+            return;
+        }
 
         display.innerHTML = `<p class="animate-pulse text-cyan-700">> SEARCHING ARCHIVES...</p>`;
 
         setTimeout(() => {
+            // We use .includes() to make it more flexible
             if (query.includes("sarah") || query.includes("oakhaven") || query.includes("elias")) {
                 display.innerHTML = `
-                    <div class="border border-yellow-500/50 p-3 bg-yellow-950/20 rounded mb-2">
+                    <div class="border border-yellow-500/50 p-3 bg-yellow-950/20 rounded mb-2 animate-in fade-in duration-500">
                         <p class="text-yellow-500 font-bold">[FILE FOUND: OAKHAVEN_2021]</p>
-                        <p class="text-white"><span class="text-cyan-500">SUBJECT:</span> Sarah [DECEASED]</p>
-                        <p class="text-white"><span class="text-cyan-500">RECORD:</span> Former associate of the Oakhaven Drug Ring.</p>
-                        <p class="text-white"><span class="text-cyan-500">INTEL:</span> Provided state evidence against lead chemist **'ELIAS'**.</p>
+                        <p class="text-white"><span class="text-cyan-500 font-bold">SUBJECT:</span> Sarah [DECEASED]</p>
+                        <p class="text-white"><span class="text-cyan-500 font-bold">RECORD:</span> Former associate of the Oakhaven Drug Ring.</p>
+                        <p class="text-white"><span class="text-cyan-500 font-bold">INTEL:</span> Provided state evidence against lead chemist. Was granted full immunity <span class="text-red-500 font-bold">'ELIAS'</span>.</p>
+                        <p class="text-xs text-slate-500 mt-2 italic">Note: Elias is suspected to have undergone facial reconstruction. Sarah has a restraining order against him.</p>
                     </div>`;
             } else {
-                display.innerHTML = `<p class="text-red-500">> NO DATA MATCHES FOR: ${query.toUpperCase()}</p>`;
+                display.innerHTML = `<p class="text-red-500 uppercase font-bold">> NO DATA MATCHES FOR: ${query.toUpperCase()}</p>
+                                     <p class="text-[10px] text-slate-600 mt-1">Try: 'Sarah', 'Elias', or 'Oakhaven'</p>`;
             }
         }, 800);
     },
@@ -244,26 +279,20 @@ const GameState = {
     },
 
     askCurrentTarget(clue) {
-    if (!this.currentTarget) {
-        const dialogs = {
-            "Sarah's Diary": "DIARY ENTRY: '...I just hope Elias never finds me. I can still smell the chemicals...'",
-            "Gold Lipstick": "An expensive shade of 'Sunset Gold'. There's a smudge on the cap...",
-            "Half-Eaten Apple": "It's browning. Someone was eating this during the murder.",
-            "Syringe Mark": "FORENSIC NOTE: A microscopic puncture. Precision work."
-        };
-        UI.log(dialogs[clue] || `SELECT A SUBJECT TO SHOW THIS ${clue.toUpperCase()}.`, "text-cyan-600 italic");
-        return;
-    }
-
-    // 1. Create a neutral, investigative message
-    const message = `[PRESENTS EVIDENCE: ${clue.toUpperCase()}] I found this in the suite. What can you tell me about it?`;
-    
-    // 2. Log your action to the console
-    UI.log(`YOU: (Showing ${clue.toUpperCase()} to ${this.currentTarget})`, "italic text-slate-400 font-bold");
-
-    // 3. Send to AI
-    this.aiTalk(this.currentTarget, message);
-},
+        if (!this.currentTarget) {
+            const dialogs = {
+                "Sarah's Diary": "DIARY ENTRY: '...I just hope Elias never finds me. I can still smell the chemicals...'",
+                "Gold Lipstick": "An expensive shade of 'Sunset Gold'. There's a smudge on the cap...",
+                "Half-Eaten Apple": "It's browning. Someone was eating this during the murder.",
+                "Syringe Mark": "FORENSIC NOTE: A microscopic puncture. Precision work."
+            };
+            UI.log(dialogs[clue] || `SELECT A SUBJECT TO SHOW THIS ${clue.toUpperCase()}.`, "text-cyan-600 italic");
+            return;
+        }
+        const message = `[PRESENTS EVIDENCE: ${clue.toUpperCase()}] I found this in the suite. What can you tell me about it?`;
+        UI.log(`YOU: (Showing ${clue.toUpperCase()} to ${this.currentTarget})`, "italic text-slate-400 font-bold");
+        this.aiTalk(this.currentTarget, message);
+    },
 
     recoveryHeartbeat() {
         let changed = false;
@@ -298,17 +327,17 @@ const GameState = {
                 const char = this.patience[c];
                 if (!char) return `<div class="p-3 bg-slate-900/40 animate-pulse text-xs">Loading Dossier...</div>`;
                 return `
-                    <div onclick="GameState.selectTarget('${c}')" class="group relative char-card p-3 rounded-lg ${this.currentTarget === c ? 'bg-cyan-900/40 border border-cyan-400' : 'bg-slate-900/60'}">
-                        <div class="absolute left-full ml-4 top-0 w-64 p-4 bg-slate-950 border-2 border-cyan-500 rounded-lg opacity-0 group-hover:opacity-100 z-[9999] pointer-events-none transition-all">
+                    <div onclick="GameState.selectTarget('${c}')" class="group relative char-card p-3 rounded-lg ${this.currentTarget === c ? 'bg-cyan-900/40 border border-cyan-400' : 'bg-slate-900/60'} w-full">
+                        <div class="absolute left-0 lg:left-full lg:ml-4 top-full lg:top-0 w-full lg:w-64 p-4 bg-slate-950 border-2 border-cyan-500 rounded-lg opacity-0 group-hover:opacity-100 z-[9999] pointer-events-none transition-all">
                             <h3 class="text-cyan-400 font-black text-[10px] uppercase">${c}</h3>
                             <p class="text-white text-[10px] italic mt-2">"${char.bio}"</p>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span>${char.icon}</span>
-                            <div>
+                            <span class="text-lg">${char.icon}</span>
+                            <div class="flex-1">
                                 <p class="text-white text-[10px] font-black uppercase">${c}</p>
-                                <div class="flex gap-0.5 mt-1">
-                                    ${Array.from({length: char.max}).map((_, i) => `<div class="w-2 h-1 ${i < char.val ? 'bg-cyan-400' : 'bg-slate-800'}"></div>`).join('')}
+                                <div class="flex gap-0.5 mt-1 w-full max-w-[100px]">
+                                    ${Array.from({length: char.max}).map((_, i) => `<div class="flex-1 h-1 ${i < char.val ? 'bg-cyan-400' : 'bg-slate-800'}"></div>`).join('')}
                                 </div>
                             </div>
                         </div>
@@ -317,12 +346,13 @@ const GameState = {
         }
 
         const ev = document.getElementById('evidence-list');
-if (ev) { ev.innerHTML = this.inventory.map(i => `
-        <div class="evidence-tile rounded-lg p-2 flex flex-col items-center bg-slate-800/40 border border-slate-700 hover:border-cyan-500 cursor-pointer" 
-             onclick="GameState.askCurrentTarget(\`${i}\`)"> <span class="text-xl">${this.evidenceMeta[i] || '📁'}</span>
-            <span class="text-[7px] font-bold uppercase text-slate-400">${i}</span>
-        </div>`).join('');
-}
+        if (ev) { 
+            ev.innerHTML = this.inventory.map(i => `
+                <div class="evidence-tile rounded-lg p-2 flex flex-col items-center bg-slate-800/40 border border-slate-700 hover:border-cyan-500 cursor-pointer min-w-[60px]" 
+                     onclick="GameState.askCurrentTarget(\`${i}\`)"> <span class="text-xl">${this.evidenceMeta[i] || '📁'}</span>
+                    <span class="text-[7px] font-bold uppercase text-slate-400 text-center">${i}</span>
+                </div>`).join('');
+        }
 
         const locLabel = document.getElementById('current-loc-label');
         if (locLabel) locLabel.innerText = `LOC: ${this.currentLoc.toUpperCase()}`;
@@ -331,6 +361,12 @@ if (ev) { ev.innerHTML = this.inventory.map(i => `
     renderMap() {
         const svg = document.getElementById('casino-map');
         if (!svg) return;
+
+        svg.setAttribute("viewBox", "0 0 240 140");
+        svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+        svg.style.width = "100%";
+        svg.style.height = "auto";
+
         const locs = [
             { n: "VIP Suite", x: 65, y: 10, w: 110, h: 50, icon: "♠️" },
             { n: "Bar Lounge", x: 5, y: 80, w: 110, h: 50, icon: "🍸" },
@@ -340,7 +376,7 @@ if (ev) { ev.innerHTML = this.inventory.map(i => `
             const active = this.currentLoc === l.n;
             return `<g onclick="GameState.travel('${l.n}')" class="cursor-pointer">
                 <rect x="${l.x}" y="${l.y}" width="${l.w}" height="${l.h}" rx="4" fill="${active ? '#00f3ff22' : '#0f172a'}" stroke="${active ? '#00f3ff' : '#1e293b'}" />
-                <text x="${l.x+l.w/2}" y="${l.y+30}" text-anchor="middle" fill="white" font-size="8">${l.icon} ${l.n}</text>
+                <text x="${l.x+l.w/2}" y="${l.y+30}" text-anchor="middle" fill="white" font-size="8" font-family="monospace">${l.icon} ${l.n}</text>
             </g>`;
         }).join('');
     },
@@ -356,6 +392,43 @@ if (ev) { ev.innerHTML = this.inventory.map(i => `
         if (this.time <= 0) this.gameOver("LOSS", "Time expired during travel.");
     }
 };
+
+// --- GOOGLE LOGIN HANDLER (OUTSIDE OBJECT) ---
+async function handleGoogleLogin(response) {
+    // Note: You need a helper to decode the JWT (like jwt-decode library or a simple split)
+    const base64Url = response.credential.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(window.atob(base64));
+
+    const res = await fetch('http://127.0.0.1:8080/api/user-sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            googleId: payload.sub,
+            displayName: payload.name,
+            email: payload.email,
+            avatar: payload.picture
+        })
+    });
+
+    const user = await res.json();
+    document.getElementById('stat-name').innerText = user.displayName;
+document.getElementById('stat-wins').innerText = user.stats.wins;
+document.getElementById('stat-losses').innerText = user.stats.losses;
+const avatar = document.getElementById('player-avatar');
+avatar.src = user.avatar;
+avatar.classList.remove('hidden');
+    
+    // Store in GameState
+    GameState.googleId = user.googleId;
+    GameState.playerStats = user.stats; 
+    
+    console.log("Logged in as:", user.displayName);
+    UI.log(`WELCOME BACK, DETECTIVE ${user.displayName.toUpperCase()}`, "text-cyan-400 font-bold");
+    
+    // Update basic UI stats if elements exist
+    if(document.getElementById('stat-name')) document.getElementById('stat-name').innerText = user.displayName;
+}
 
 const UI = {
     log(m, c, id = null) {
@@ -384,7 +457,8 @@ const UI = {
         element.innerHTML = "";
         for (let i = 0; i < message.length; i++) {
             element.innerHTML += message[i];
-            document.getElementById('end-feedback-terminal').scrollTop = document.getElementById('end-feedback-terminal').scrollHeight;
+            const feedbackTerminal = document.getElementById('end-feedback-terminal');
+            if(feedbackTerminal) feedbackTerminal.scrollTop = feedbackTerminal.scrollHeight;
             await new Promise(r => setTimeout(r, 15));
         }
     },
@@ -406,3 +480,4 @@ const UI = {
 
 window.GameState = GameState;
 window.UI = UI;
+window.handleGoogleLogin = handleGoogleLogin;

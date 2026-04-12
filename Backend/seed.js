@@ -11,7 +11,7 @@ const subjects = [
 
         icon: "🧪", 
 
-        bio: "An expert in synthetic toxins. Speaks with terrifying, clinical precision. He seems far too calm for a double homicide scene.", 
+        bio: "An expert in synthetic toxins. Speaks with terrifying, clinical precision. He seems far too calm for a double homicide scene. However, he strongly hides his past as a chemist, and pretends to be just a PA.", 
 
         secret: "Elias didn't die in that prison transport, Detective. He just found a better suit. Sarah was a loose end from Oakhaven that had to be cut.",
 
@@ -127,9 +127,9 @@ const subjects = [
 
         icon: "🧥", 
 
-        bio: "A quiet assistant who has gone completely pale. He's staring at a fixed point on the wall, paralyzed by the situation.", 
+        bio: "Greedy. Is already thinking of ways to turn this into a publicity stunt or a money making event for his boss.", 
 
-        secret: "I didn't see anything. I was just standing by the door. Everything happened so fast. I just want this to be over.",
+        secret: "I don't care. It doesn't matter to me.",
 
         patienceVal: 5, patienceMax: 5
 
