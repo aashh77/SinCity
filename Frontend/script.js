@@ -192,6 +192,7 @@ const GameState = {
                 body: JSON.stringify({ target, theory })
             });
             const result = await response.json();
+            window.lastGameOutcome = result.success ? 'perfect' : 'fail';
             this.gameOver(result.success ? "WIN" : "LOSS", result.feedback);
         } catch (err) {
             UI.log("WARRANT TRANSMISSION FAILED.", "text-red-600");
@@ -464,6 +465,11 @@ const UI = {
             if(feedbackTerminal) feedbackTerminal.scrollTop = feedbackTerminal.scrollHeight;
             await new Promise(r => setTimeout(r, 15));
         }
+
+        setTimeout(() => {
+        const btn = document.getElementById('claim-rewards-btn');
+        if(btn) btn.classList.remove('hidden');
+    }, 500);
     },
     toggleAccusation() {
         const modal = document.getElementById('accuse-modal');
@@ -628,19 +634,37 @@ const PhoneSystem = {
 
     finishGame(choice, d1, d2, status, btns) {
         const win = Math.random() < 0.30;
-        let r1, r2, total;
+        let r1, r2;
+        
         if (win) {
-            if (choice === 'down') { r1=1; r2=2; } else if (choice === 'up') { r1=5; r2=5; } else { r1=3; r2=4; }
-            status.innerHTML = `<span class="text-green-500 uppercase">${this.hints[Math.floor(Math.random()*this.hints.length)]}</span>`;
-            UI.log("GAMBLE WIN: INTEL RETRIEVED", "text-green-500");
+            // Pick winning dice
+            if (choice === 'down') { r1=1; r2=2; } 
+            else if (choice === 'up') { r1=5; r2=5; } 
+            else { r1=3; r2=4; }
+            
+            const retrievedIntel = this.hints[Math.floor(Math.random()*this.hints.length)];
+            status.innerHTML = `<span class="text-green-500 uppercase">INTEL DECRYPTED!</span>`;
+            
+            // --- 1. Push to Phone Chat (for history) ---
+            this.contacts.boss.messages.push(`[ENCRYPTED LEAK]: ${retrievedIntel}`);
+            
+            const cleanClue = retrievedIntel.replace("SECRET INTEL: ", "");
+            UI.log(`DECRYPTED INTEL: ${cleanClue.toUpperCase()}`, "text-green-400 font-bold border-y border-green-900/50 py-2");
+            
         } else {
+            // Pick losing dice
             if (choice === 'down') { r1=5; r2=6; } else { r1=1; r2=2; }
-            GameState.time -= 10;
+            
+            // --- 3. Increased Penalty to 20 mins ---
+            GameState.time -= 20; 
             GameState.updateUI();
-            status.innerHTML = `<span class="text-red-500 uppercase">LOST. -10 MINS PENALTY</span>`;
-            UI.log("GAMBLE LOSS: -10 MINS", "text-red-600");
+            
+            status.innerHTML = `<span class="text-red-500 uppercase">LOST. -20 MINS</span>`;
+            UI.log("CASINO LOSS: TIME PENALTY APPLIED (-20 MINS)", "text-red-600");
         }
-        d1.innerText = r1; d2.innerText = r2;
+        
+        d1.innerText = r1; 
+        d2.innerText = r2;
         d1.style.transform = d2.style.transform = 'none';
         setTimeout(() => btns.forEach(b => b.disabled = false), 1000);
     },
@@ -694,3 +718,116 @@ window.PhoneSystem = PhoneSystem;
 window.GameState = GameState;
 window.UI = UI;
 window.handleGoogleLogin = handleGoogleLogin;
+
+let currentSpins = 0;
+const icons = ['🕵️‍♂️', '🧪', '🚔', '💰'];
+
+// 1. Logic to show the button AFTER the AI finishes typing
+UI.showSlotMachine = function() {
+    document.getElementById('claim-rewards-btn').classList.add('hidden');
+    document.getElementById('slot-machine-ui').classList.remove('hidden');
+    
+    // Set spins based on the result stored in window
+    const outcome = window.lastGameOutcome || 'fail';
+    if (outcome === 'perfect') currentSpins = 10;
+    else if (outcome === 'partial') currentSpins = 3;
+    else currentSpins = 1;
+    
+    document.getElementById('spin-count').innerText = currentSpins;
+};
+
+// 2. Handle the spinning
+function handleSpinClick() {
+    if (currentSpins <= 0) return;
+    currentSpins--;
+    document.getElementById('spin-count').innerText = currentSpins;
+
+    const forceWin = Math.random() < 0.8; // 80% Win chance for demo
+    let results = forceWin ? 
+        Array(3).fill(icons[Math.floor(Math.random() * icons.length)]) : 
+        [icons[0], icons[1], icons[2]];
+
+    results.forEach((icon, i) => {
+        const strip = document.getElementById(`strip${i + 1}`);
+        strip.classList.add('is-spinning');
+        
+        setTimeout(() => {
+            strip.style.top = `-${icons.indexOf(icon) * 80}px`;
+            strip.classList.remove('is-spinning');
+
+            // --- CHECK FOR WIN OR FINAL LOSS ---
+            if (i === 2) {
+                const isWin = results[0] === results[1] && results[1] === results[2];
+                
+                if (isWin) {
+                    triggerJackpot();
+                } else if (currentSpins <= 0) {
+                    // 🎯 NO SPINS LEFT AND NO WIN
+                    handleFinalLoss();
+                }
+            }
+        }, 1000 + (i * 400));
+    });
+}
+
+function triggerJackpot() {
+    setTimeout(() => {
+        const colors = ['#00f3ff', '#ff00ff', '#00ff00', '#ffff00', '#ff003c'];
+        const particleCount = 150;
+
+        for (let i = 0; i < particleCount; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti-particle';
+            
+            // Randomly pick a neon color
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.setProperty('--color', color);
+            
+            // Random starting position (center of screen)
+            confetti.style.left = '50vw';
+            confetti.style.top = '50vh';
+            
+            // Random horizontal and vertical spread
+            const velocityX = (Math.random() - 0.5) * 2000; // Wide horizontal burst
+            const velocityY = (Math.random() - 0.7) * 1000; // Upward burst
+            confetti.style.setProperty('--x', `${velocityX}px`);
+            confetti.style.setProperty('--y', `${velocityY}px`);
+
+            document.body.appendChild(confetti);
+
+            // Clean up after animation
+            setTimeout(() => confetti.remove(), 4000);
+        }
+
+        const winMsg = document.createElement('div');
+        winMsg.className = 'winner-toast';
+        winMsg.innerHTML = "JACKPOT<br><span style='font-size:1.2rem; letter-spacing: 0.5em; color: var(--cyan);'>REINITIALIZING TERMINAL...</span>";
+        document.body.appendChild(winMsg);
+
+        setTimeout(() => location.reload(), 5000);
+    }, 1000);
+}
+
+// 3. Update your existing GameState.submitFinalTheory to store the outcome
+// Find your fetch call in script.js and add:
+// window.lastGameOutcome = result.success ? 'perfect' : 'fail';
+
+// 4. In your UI.typeLogNarrative function, add this at the very end of the loop:
+// document.getElementById('claim-rewards-btn').classList.remove('hidden');
+
+function handleFinalLoss() {
+    setTimeout(() => {
+        const lossMsg = document.createElement('div');
+        lossMsg.className = 'winner-toast'; // Reusing your toast style
+        lossMsg.style.textShadow = "0 0 20px #ff003c, 0 0 40px #ff003c"; // Red glow for loss
+        lossMsg.innerHTML = "BETTER LUCK NEXT TIME<br><span style='font-size:1rem; color: #fff;'>TERMINATING SESSION...</span>";
+        document.body.appendChild(lossMsg);
+
+        // Redirect to Login/Refresh after 3 seconds
+        setTimeout(() => {
+            location.reload();
+        }, 3000);
+    }, 1000);
+}
+
+window.handleSpinClick = handleSpinClick;

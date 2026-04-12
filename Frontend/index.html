@@ -205,22 +205,37 @@
 
     <script src="script.js"></script>
 
-    <div id="end-screen" class="hidden fixed inset-0 z-[5000] bg-black/95 flex items-center justify-center p-6 backdrop-blur-sm transition-opacity duration-1000">
-        <div class="max-w-4xl w-full neon-box-cyan p-8 md:p-12 relative overflow-y-auto max-h-[95vh] flex flex-col items-center">
-            <h1 id="end-status-header" class="font-['Syncopate'] text-3xl md:text-6xl text-center mb-8 tracking-[0.2em] font-black uppercase text-red-600 shadow-[0_0_30px_#ff0000]">
-                STATUS_TERMINATED
-            </h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-10">
-                <img id="end-image" src="" alt="CASE RESOLUTION" class="w-full h-48 md:h-80 object-cover border-4 border-cyan-700 shadow-[0_0_20px_#00c3ff44]">
-                <div id="end-feedback-terminal" class="bg-black/80 border border-cyan-900 p-6 font-mono text-sm leading-relaxed text-cyan-200 h-48 md:h-80 overflow-y-auto custom-scrollbar">
-                    > ESTABLISHING SECURE CONNECTION...<br>
-                    <span id="end-ai-feedback" class="text-white mt-4 block"></span>
+    <div id="end-screen" class="hidden fixed inset-0 z-[5000] bg-black/95 flex items-center justify-center p-6 backdrop-blur-md">
+    <div class="max-w-4xl w-full neon-box-cyan p-8 md:p-12 flex flex-col items-center">
+        <h1 id="end-status-header" class="font-['Syncopate'] text-3xl text-center mb-8 uppercase">STATUS_TERMINATED</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-6">
+            <img id="end-image" src="" class="w-full h-48 md:h-64 object-cover border-2 border-cyan-700">
+            <div id="end-feedback-terminal" class="bg-black/80 border border-cyan-900 p-6 font-mono text-sm leading-relaxed text-cyan-200 h-48 md:h-64 overflow-y-auto">
+                <span id="end-ai-feedback"></span>
+            </div>
+        </div>
+
+        <button id="claim-rewards-btn" onclick="UI.showSlotMachine()" class="hidden w-full py-4 bg-yellow-600 text-white font-black uppercase tracking-[0.3em] hover:bg-yellow-400 border-2 border-yellow-400 animate-bounce">
+            💰 CLAIM CASINO REWARDS 💰
+        </button>
+
+        <div id="slot-machine-ui" class="hidden mt-8 p-6 border-t-2 border-cyan-500/30 text-center">
+            <div class="flex justify-center gap-4 mb-4">
+                <div class="reel-window border-2 border-white w-[80px] h-[80px] overflow-hidden relative bg-black">
+                    <div id="strip1" class="reel-strip absolute w-full text-4xl leading-[80px]">🕵️‍♂️<br>🧪<br>🚔<br>💰<br>🕵️‍♂️</div>
+                </div>
+                <div class="reel-window border-2 border-white w-[80px] h-[80px] overflow-hidden relative bg-black">
+                    <div id="strip2" class="reel-strip absolute w-full text-4xl leading-[80px]">🕵️‍♂️<br>🧪<br>🚔<br>💰<br>🕵️‍♂️</div>
+                </div>
+                <div class="reel-window border-2 border-white w-[80px] h-[80px] overflow-hidden relative bg-black">
+                    <div id="strip3" class="reel-strip absolute w-full text-4xl leading-[80px]">🕵️‍♂️<br>🧪<br>🚔<br>💰<br>🕵️‍♂️</div>
                 </div>
             </div>
-            <button onclick="location.reload()" class="w-full py-6 bg-cyan-600 text-white font-black uppercase tracking-[0.4em] hover:bg-cyan-400 hover:text-black transition-all shadow-lg border-2 border-cyan-400">
-                REINITIALIZE UNIT
-            </button>
+            <p class="font-mono text-xs text-cyan-500 uppercase mb-4">SPINS: <span id="spin-count">0</span></p>
+            <button id="spin-button" onclick="handleSpinClick()" class="px-8 py-2 bg-cyan-500 text-black font-bold uppercase text-xs">SPIN</button>
         </div>
     </div>
+</div>
 </body>
 </html>

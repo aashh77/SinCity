@@ -225,3 +225,76 @@ aside, #character-panel {
     background: rgba(15, 23, 42, 0.8);
     border: 1px solid rgba(0, 243, 255, 0.2);
 }
+
+.reel-strip {
+    transition: top 2s cubic-bezier(0.1, 0, 0.1, 1);
+    top: 0;
+}
+
+.is-spinning {
+    filter: blur(4px) brightness(1.5);
+}
+
+/* Ensure the winner toast is visible and centered */
+.winner-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    text-align: center;
+    font-family: 'Syncopate', sans-serif;
+    color: white;
+    text-shadow: 0 0 20px #00f3ff, 0 0 40px #00f3ff;
+    font-size: 4rem;
+    pointer-events: none;
+}
+
+/* --- UPDATED NEON SPARK PHYSICS --- */
+.confetti-particle {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background-color: var(--color);
+    box-shadow: 0 0 10px var(--color), 0 0 20px var(--color); /* Neon Glow */
+    border-radius: 2px;
+    z-index: 9999;
+    pointer-events: none;
+    /* This animation handles the "Burst" and the "Fall" */
+    animation: neonBurst 4s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+}
+
+@keyframes neonBurst {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        /* Move to random X/Y coordinates defined in JS, then drop to floor */
+        transform: translate(var(--x), var(--y)) translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Enhanced Jackpot Text */
+.winner-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    text-align: center;
+    font-family: 'Syncopate', sans-serif;
+    color: white;
+    text-shadow: 0 0 20px #fff, 0 0 40px var(--cyan);
+    font-size: 5rem;
+    font-weight: 900;
+    pointer-events: none;
+    animation: textFlicker 0.1s infinite;
+}
+
+@keyframes textFlicker {
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
