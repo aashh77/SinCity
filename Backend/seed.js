@@ -59,7 +59,7 @@ const subjects = [
 
         bio: "Former military. He has a nervous facial tic and keeps checking the hallway cameras with trembling hands. THe guard.", 
 
-        secret: "He abandoned his post for a few minutes. If the Floor Manager finds out, he's done. In an affair with Lady Sterling.",
+        secret: "He abandoned his post for a few minutes. If the Floor Manager finds out, he's done. In an affair with Lady Sterling. WILL MENTION ALCOHOL POISONING WHEN SHOWS SYRINGE MARK",
 
         patienceVal: 8, patienceMax: 8
 
@@ -85,9 +85,9 @@ const subjects = [
 
         icon: "😰", 
 
-        bio: "A high-stakes gambler who has lost everything tonight. He's shaking and sweating profusely. A VIP", 
+        bio: "A high-stakes gambler who has lost everything tonight. He's shaking and sweating profusely. HE STAMMERS. A VIP", 
 
-        secret: "The m-m-merger! If my name is tied to a murder investigation, the stocks will crash and my board of directors will ruin me. I saw a shadow in the hall, but I can't be involved! He stammers.",
+        secret: "HE STAMMERS. IS WORRIED ABOUT HIS MERGER",
 
         patienceVal: 6, patienceMax: 6
 
