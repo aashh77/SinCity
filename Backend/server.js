@@ -256,7 +256,7 @@ app.post('/api/verify-warrant', async (req, res) => {
            - Revenge or the snitching incident.
            - The use of toxins/chemistry.
 
-        RESPONSE FORMAT:
+        RESPONSE FORMAT :
         Return a JSON object: 
         { "success": true/false, "feedback": "A noir-style message from High Command explaining the outcome." }
     `;
