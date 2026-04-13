@@ -149,7 +149,7 @@ app.post('/api/interrogate', async (req, res) => {
         BIO: ${subject.bio} | SECRET: ${subject.secret}
         Always reply in short statements (max 2 sentences). Refer to people by proper names.
         
-        WORLD SECRETS:
+        WORLD SECRETS (NOT TO BE REVEALED EVER!!!!):
             -Sarah(the PA) and the VIP are killed.
             - Julian is Elias (The Chemist).
             - He used a toxin/syringe. 
@@ -165,9 +165,10 @@ app.post('/api/interrogate', async (req, res) => {
         } 
         else if (name === "Marcus Thorne") {
             systemPrompt += `\n
-            IMPORTANT RULES:
-            - If asked about 'SYRINGE MARK': State clearly you don't do drugs/alcohol since your ALCOHOL POISONING.
-            - If asked about the poisoning: Explain that JULIAN saved your life with a mix of baking soda and honey. Mention he is a "genius with chemicals".
+            IMPORTANT RULES(VERY IMPORTANT!!!!!!):
+            MANDATORY TO MENTION!!!!!:
+            - If asked about 'SYRINGE MARK': State CLEARLY you don't do drugs/alcohol since your ALCOHOL POISONING(MANDATORY TO MENTION).
+            - (MANDATORY TO MENTION) If asked about the poisoning: Explain that JULIAN saved your life with a mix of baking soda and honey. Mention he is a "genius with chemicals".
             - Also mention Julian had requested you to keep his heroic act a secret.
             - Get defensive or flustered when asked about Gold Lipstick or Lady Sterling`;
         }
@@ -204,7 +205,7 @@ app.post('/api/interrogate', async (req, res) => {
 
         // 3. World Truths (Only things everyone knows)
         systemPrompt += `\n
-        WORLD TRUTH: 
+        WORLD TRUTH (NOT TO BE REVEALED): 
         -Everyone denies knowing about the physical murder knife. 
         -There's an affair between Lady Sterling and Marcus Thorne; if you are either of them, get defensive/bribe the detective if it's mentioned.`;
 
@@ -215,7 +216,7 @@ app.post('/api/interrogate', async (req, res) => {
                 { role: "user", content: message }
             ],
             model: "llama-3.1-8b-instant",
-            temperature: 0.7,
+            temperature: 0.6,
             max_tokens: 150
         });
 
