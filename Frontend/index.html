@@ -81,6 +81,31 @@
                 <span class="animate-pulse">●</span> Active Subjects
             </h2>
             <div id="character-panel" class="space-y-3 overflow-y-auto custom-scrollbar pr-2"></div>
+            <div class="relative mt-8 mx-auto w-full max-w-[280px] bg-[#d97706] p-1 rounded-t-lg shadow-2xl">
+    <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-16 h-8 bg-gradient-to-b from-gray-400 to-gray-600 rounded-t-md border-b-4 border-gray-800 flex items-center justify-center z-10 shadow-lg">
+        <div class="w-8 h-1 bg-gray-800/30 rounded-full"></div>
+    </div>
+
+    <div class="bg-[#fef3c7] min-h-[300px] p-4 shadow-inner border-t-8 border-transparent">
+        <h3 class="text-[#92400e] font-serif font-black text-xs uppercase border-b border-[#d97706]/30 mb-3 text-center tracking-widest">
+            Case File: SinCity
+        </h3>
+        
+        <div class="grid grid-cols-1 gap-1 mb-4" id="clipboard-grid">
+            </div>
+
+        <div class="border-t-2 border-dashed border-[#d97706]/20 my-2"></div>
+
+        <textarea 
+            class="w-full h-32 bg-transparent font-serif text-[11px] text-[#78350f] placeholder-[#d97706]/50 focus:outline-none resize-none leading-relaxed"
+            placeholder="Write leads here..."></textarea>
+    </div>
+</div>
+
+    <textarea 
+        class="w-full h-24 bg-transparent border border-amber-900/30 p-2 text-[10px] text-amber-200/70 focus:outline-none focus:border-amber-600 resize-none"
+        placeholder=""></textarea>
+</div>
         </aside>
 
         <section class="flex-grow flex flex-col gap-4 min-w-0 order-2 lg:order-none">
@@ -235,6 +260,24 @@
             <p class="font-mono text-xs text-cyan-500 uppercase mb-4">SPINS: <span id="spin-count">0</span></p>
             <button id="spin-button" onclick="handleSpinClick()" class="px-8 py-2 bg-cyan-500 text-black font-bold uppercase text-xs">SPIN</button>
         </div>
+    </div>
+</div>
+<div class="fixed bottom-0 left-0 w-full bg-zinc-950 border-t-2 border-cyan-500/50 py-1.5 z-[100] pointer-events-none">
+    <div class="whitespace-nowrap flex animate-ticker">
+        <span class="px-10 font-mono text-[11px] font-bold text-red-500 tracking-tighter">
+            [NEWS ALERT] SINCITY GAZETTE: UNIDENTIFIED BODY FOUND IN DOCKS — POLICE OVERWHELMED // 
+            CURFEW EXTENDED FOR LOWER DISTRICTS UNTIL FURTHER NOTICE // 
+            MAYOR DENIES ALLEGATIONS OF NEURAL-LINK DATA HARVESTING // 
+            WEATHER: ACID FOG TO PERSIST THROUGH THE WEEKEND // 
+            HIGH-COMMAND JUSTICE AI ANNOUNCES 98% CONVICTION RATE SUCCESS
+        </span>
+        <span class="px-10 font-mono text-[11px] font-bold text-yellow-500 tracking-tighter">
+            [NEWS ALERT] SINCITY GAZETTE: UNIDENTIFIED BODY FOUND IN DOCKS — POLICE OVERWHELMED // 
+            CURFEW EXTENDED FOR LOWER DISTRICTS UNTIL FURTHER NOTICE // 
+            MAYOR DENIES ALLEGATIONS OF NEURAL-LINK DATA HARVESTING // 
+            WEATHER: ACID FOG TO PERSIST THROUGH THE WEEKEND // 
+            HIGH-COMMAND JUSTICE AI ANNOUNCES 98% CONVICTION RATE SUCCESS
+        </span>
     </div>
 </div>
 </body>

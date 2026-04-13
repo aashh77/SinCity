@@ -35,11 +35,13 @@ const GameState = {
             clue: "Half-Eaten Apple" 
         }
     },
+    
 
     async init() {
         this.renderMap();
         this.updateUI();
         this.startClock();
+        this.renderClipboard();
         this.startTime = Date.now(); 
         if (window.PhoneSystem) {
             window.PhoneSystem.init();
@@ -60,7 +62,13 @@ const GameState = {
                         secret: s.secret
                     };
                 });
+                const suspects = [
+    "Elena", "PA-Julian", "VIP-Arrogant", 
+    "Manager", "Guard", "VIP-Stammer", 
+    "VIP-Deaf", "PA-Viktor", "PA-Jax"
+];
                 this.updateUI(); 
+                
             }
         } catch (err) {
             console.error("Fetch failed:", err);
@@ -393,7 +401,40 @@ const GameState = {
         this.renderMap();
         UI.log(`RELOCATED TO ${loc.toUpperCase()}. (-15 MINS TRAVEL). The air smells of luxury.`, "text-red-400 italic");
         if (this.time <= 0) this.gameOver("LOSS", "Time expired during travel.");
-    }
+    },
+
+    // ... (previous GameState code)
+    travel(loc) {
+        if (this.currentLoc === loc) return;
+        this.time -= 15;
+        this.currentLoc = loc;
+        this.currentTarget = null;
+        this.updateUI();
+        this.renderMap();
+        UI.log(`RELOCATED TO ${loc.toUpperCase()}. (-15 MINS TRAVEL). The air smells of luxury.`, "text-red-400 italic");
+        if (this.time <= 0) this.gameOver("LOSS", "Time expired during travel.");
+    }, // Add a comma here if there isn't one
+
+    // --- ADD THIS NEW METHOD TO GAMESTATE ---
+    renderClipboard() {
+    const suspectsList = [
+        "Elena Rossi", "Julian Vane", "Lady Sterling", 
+        "Manager Silas", "Marcus Thorne", "Arthur Penhaligon", 
+        "Judge Halloway", "Viktor Kross", "Jax Miller"
+    ];
+    const grid = document.getElementById('clipboard-grid');
+    if (!grid) return;
+
+    grid.innerHTML = suspectsList.map(s => `
+        <div onclick="this.classList.toggle('line-through')" 
+             class="group cursor-pointer flex items-center gap-2 text-[10px] text-[#92400e] font-bold py-0.5 select-none transition-all">
+            <span class="w-3 h-3 border border-[#d97706]/50 flex-shrink-0 flex items-center justify-center text-[8px] group-[.line-through]:bg-red-900 group-[.line-through]:text-white">
+                ✕
+            </span>
+            ${s.toUpperCase()}
+        </div>
+    `).join('');
+}
 };
 
 // --- GOOGLE LOGIN HANDLER (OUTSIDE OBJECT) ---
@@ -587,27 +628,35 @@ const PhoneSystem = {
     },
 
     openGame() {
-        document.getElementById('phone-back-btn').classList.remove('invisible');
-        document.getElementById('phone-header-title').innerText = "CASINO";
-        const container = document.getElementById('phone-content');
-        container.innerHTML = `
-            <div class="flex flex-col items-center p-2">
-                <div class="w-full text-center py-4 bg-yellow-500/10 rounded-xl border border-yellow-500/30 mb-8">
-                    <p class="text-yellow-500 font-black text-[10px] tracking-widest">ROLL THE BONES</p>
-                </div>
-                <div class="flex gap-6 mb-12">
-                    <div id="die1" class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl text-black shadow-[0_10px_0_#cbd5e1] font-black border-2 border-slate-300">?</div>
-                    <div id="die2" class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl text-black shadow-[0_10px_0_#cbd5e1] font-black border-2 border-slate-300">?</div>
-                </div>
-                <div class="grid w-full gap-3">
-                    <button onclick="PhoneSystem.playGame('down')" class="game-btn border-2 border-blue-500 p-3 text-blue-500 text-[10px] font-black rounded-lg uppercase">7 Down (2-6)</button>
-                    <button onclick="PhoneSystem.playGame('seven')" class="game-btn border-2 border-yellow-500 p-3 text-yellow-500 text-[10px] font-black rounded-lg uppercase">Lucky 7</button>
-                    <button onclick="PhoneSystem.playGame('up')" class="game-btn border-2 border-green-500 p-3 text-green-500 text-[10px] font-black rounded-lg uppercase">7 Up (8-12)</button>
-                </div>
-                <div id="game-status" class="mt-8 text-[10px] text-center font-bold h-10"></div>
+    document.getElementById('phone-back-btn').classList.remove('invisible');
+    document.getElementById('phone-header-title').innerText = "CASINO";
+    const container = document.getElementById('phone-content');
+    container.innerHTML = `
+        <div class="flex flex-col items-center p-2">
+            <div class="w-full text-center py-3 bg-yellow-500/10 rounded-xl border border-yellow-500/30 mb-2">
+                <p class="text-yellow-500 font-black text-[10px] tracking-widest uppercase">Roll the Bones</p>
             </div>
-        `;
-    },
+            
+            <div class="mb-6 text-center">
+                <p class="text-[9px] text-cyan-500/70 font-bold italic tracking-tighter">
+                    "RISK YOUR TIME. WIN THE INTEL."
+                </p>
+                <div class="w-16 h-[1px] bg-cyan-900 mx-auto mt-1"></div>
+            </div>
+
+            <div class="flex gap-6 mb-12">
+                <div id="die1" class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl text-black shadow-[0_10px_0_#cbd5e1] font-black border-2 border-slate-300">?</div>
+                <div id="die2" class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl text-black shadow-[0_10px_0_#cbd5e1] font-black border-2 border-slate-300">?</div>
+            </div>
+            <div class="grid w-full gap-3">
+                <button onclick="PhoneSystem.playGame('down')" class="game-btn border-2 border-blue-500 p-3 text-blue-500 text-[10px] font-black rounded-lg uppercase hover:bg-blue-500/10 transition-colors">7 Down (2-6)</button>
+                <button onclick="PhoneSystem.playGame('seven')" class="game-btn border-2 border-yellow-500 p-3 text-yellow-500 text-[10px] font-black rounded-lg uppercase hover:bg-yellow-500/10 transition-colors">Lucky 7</button>
+                <button onclick="PhoneSystem.playGame('up')" class="game-btn border-2 border-green-500 p-3 text-green-500 text-[10px] font-black rounded-lg uppercase hover:bg-green-500/10 transition-colors">7 Up (8-12)</button>
+            </div>
+            <div id="game-status" class="mt-8 text-[10px] text-center font-bold h-10 tracking-widest uppercase"></div>
+        </div>
+    `;
+},
 
     playGame(choice) {
         const d1 = document.getElementById('die1');
