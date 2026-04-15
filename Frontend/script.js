@@ -1010,12 +1010,6 @@ function triggerJackpot() {
     }, 1000);
 }
 
-// 3. Update your existing GameState.submitFinalTheory to store the outcome
-// Find your fetch call in script.js and add:
-// window.lastGameOutcome = result.success ? 'perfect' : 'fail';
-
-// 4. In your UI.typeLogNarrative function, add this at the very end of the loop:
-// document.getElementById('claim-rewards-btn').classList.remove('hidden');
 
 function handleFinalLoss() {
     setTimeout(() => {
@@ -1025,10 +1019,10 @@ function handleFinalLoss() {
         lossMsg.innerHTML = "BETTER LUCK NEXT TIME<br><span style='font-size:1rem; color: #fff;'>TERMINATING SESSION...</span>";
         document.body.appendChild(lossMsg);
 
-        // Redirect to Login/Refresh after 3 seconds
+        // Redirect to Login/Refresh after 5 seconds
         setTimeout(() => {
             location.reload();
-        }, 3000);
+        }, 5000);
     }, 1000);
 }
 
