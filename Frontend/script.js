@@ -320,16 +320,38 @@ const GameState = {
     updateUI() {
         const timerDisplay = document.getElementById('timer-display');
         const timeDisplayLarge = document.getElementById('time-display');
-        const timeBar = document.getElementById('time-bar');
+        const timerBar = document.getElementById('timer-bar');
 
-        if (timerDisplay) {
-            const hours = Math.floor(this.time / 60);
-            const mins = this.time % 60;
-            const formatted = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-            timerDisplay.innerText = `REMAINING: ${formatted}`;
-            if (timeDisplayLarge) timeDisplayLarge.innerText = formatted;
-            if (timeBar) timeBar.style.width = `${(this.time / 1440) * 100}%`;
+        const TOTAL_START_TIME = 1440; 
+
+    if (timeDisplayLarge) {
+        const hours = Math.floor(this.time / 60);
+        const mins = this.time % 60;
+        const formatted = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+        timeDisplayLarge.innerText = formatted;
+        
+        // --- TIMER BAR LOGIC ---
+        if (timerBar) {
+            const percentage = (this.time / TOTAL_START_TIME) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            // Remove existing color classes first
+            timerBar.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-500', 'shadow-[0_0_15px_#22c55e]', 'shadow-[0_0_15px_#eab308]', 'shadow-[0_0_15px_#ef4444]');
+
+            // Color logic based on 8-hour blocks (480 mins each)
+            if (this.time > 960) { 
+                // First 8 hours (24:00 down to 16:00)
+                timerBar.classList.add('bg-green-500', 'shadow-[0_0_15px_#22c55e]');
+            } else if (this.time > 480) { 
+                // Middle 8 hours (16:00 down to 08:00)
+                timerBar.classList.add('bg-yellow-500', 'shadow-[0_0_15px_#eab308]');
+            } else { 
+                // Final 8 hours (08:00 down to 00:00)
+                timerBar.classList.add('bg-red-500', 'shadow-[0_0_15px_#ef4444]');
+                timeDisplayLarge.classList.add('text-red-500', 'animate-pulse');
+            }
         }
+    }
 
         const panel = document.getElementById('character-panel');
         if (panel) {
@@ -524,6 +546,13 @@ const UI = {
     toggleDatabase() {
         const modal = document.getElementById('database-modal');
         modal.classList.toggle('hidden');
+    },
+
+    toggleRules() {
+        const modal = document.getElementById('rules-modal');
+        if (modal) {
+            modal.classList.toggle('hidden');
+        }
     }
 };
 const PhoneSystem = {

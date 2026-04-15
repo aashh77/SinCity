@@ -62,16 +62,27 @@
             </div>
         </div>
         
-        <div class="flex items-center gap-4 md:gap-12">
-            <div class="text-right">
-                <p id="time-display" class="text-2xl md:text-4xl font-mono font-black text-cyan-400 drop-shadow-[0_0_8px_#00f3ff]">24:00</p>
-                <div class="w-20 md:w-32 h-1 bg-slate-800 mt-1">
-                    <div id="time-bar" class="h-full bg-cyan-500 transition-all duration-1000" style="width: 100%"></div>
-                </div>
-                <span id="timer-display" class="hidden"></span>
-            </div>
-            <button onclick="UI.toggleAccusation()" class="bg-red-600/20 border-2 border-red-600 px-4 py-2 md:px-6 md:py-3 rounded-lg font-black uppercase text-[8px] md:text-[10px] text-red-500 hover:bg-red-600 hover:text-white transition-all">Issue Warrant</button>
-        </div>
+        <div class="flex items-center gap-6">
+
+    <div class="flex items-center gap-6">
+    <button onclick="UI.toggleRules()" class="w-10 h-10 flex-shrink-0 rounded-full border border-cyan-500/50 flex items-center justify-center text-cyan-400 font-serif italic text-xl hover:bg-cyan-500 hover:text-black transition-all shadow-[0_0_15px_rgba(0,243,255,0.2)]">
+        i
+    </button>
+
+    <div class="flex flex-col items-center min-w-[120px] gap-1">
+    <p id="time-display" class="text-3xl md:text-4xl font-mono font-black text-cyan-400 drop-shadow-[0_0_8px_#00f3ff] leading-none">
+        24:00
+    </p>
+    <div class="w-full h-1 bg-slate-900/80 rounded-full border border-white/10 overflow-hidden">
+        <div id="timer-bar" class="h-full transition-all duration-1000 linear" style="width: 100%;"></div>
+    </div>
+</div>
+    </div>
+
+    <button onclick="UI.toggleAccusation()" class="bg-red-600/20 border-2 border-red-600 px-4 py-2 rounded-lg font-black uppercase text-[10px] text-red-500 hover:bg-red-600 hover:text-white transition-all">
+        Issue Warrant
+    </button>
+</div>
     </header>
 
     <main class="flex-grow flex flex-col lg:flex-row gap-6 lg:min-h-0 lg:overflow-hidden">
@@ -149,6 +160,84 @@
             </div>
         </div>
     </div>
+
+    <div id="rules-modal" class="hidden fixed inset-0 z-[4000] bg-slate-950/95 flex items-center justify-center p-4 md:p-6 backdrop-blur-md">
+    <div class="neon-box max-w-xl w-full p-6 md:p-8 border-cyan-500 border-2 relative">
+        <div class="absolute top-0 left-0 w-full h-1 bg-cyan-500 shadow-[0_0_15px_#00f3ff]"></div>
+        
+        <h2 class="font-['Syncopate'] text-cyan-400 text-xl mb-6 tracking-widest text-center">INVESTIGATION_PROTOCOLS</h2>
+        
+        <div class="space-y-4 font-mono text-xs text-cyan-100/90 leading-relaxed max-h-[60vh] overflow-y-auto custom-scrollbar pr-2 text-left">
+    
+    <div>
+        <p class="text-cyan-400 font-bold underline uppercase">1. SUBJECTS & DOSSIERS (LEFT)</p>
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+            <li><span class="text-white">Hover Names:</span> Reveals subject history and alibis.</li>
+            <li><span class="text-white">Patience:</span> Interrogating costs blue segments. If empty, the subject remains silent.</li>
+        </ul>
+    </div>
+
+    <div>
+        <p class="text-cyan-400 font-bold underline uppercase">2. TACTICAL OVERLAY (MAP)</p>
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+            <li><span class="text-white">Movement:</span> Click a room to relocate.</li>
+            <li><span class="text-white">Cost:</span> Every move consumes 15 Minutes of investigation time.</li>
+        </ul>
+    </div>
+
+    <div>
+        <p class="text-cyan-400 font-bold underline uppercase">3. FIELD INVESTIGATION (TERMINAL)</p>
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+            <li><span class="text-white">Command:</span> Type "search" in the chatbox to uncover hidden physical evidence in your current room.</li>
+            <li><span class="text-white">Evidence:</span> Click a found item in your locker to print its description and incriminating details.</li>
+        </ul>
+    </div>
+
+    <div>
+        <p class="text-cyan-400 font-bold underline uppercase">4. CONFRONTATION</p>
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+            <li><span class="text-white">The Loop:</span> To show proof, Click Subject Card first to focus them, then Click Evidence Tile to force a response.</li>
+        </ul>
+    </div>
+
+    <div>
+        <p class="text-cyan-400 font-bold underline uppercase">5. DETECTIVE’S TOOLS</p>
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+            <li><span class="text-white">Clipboard:</span> Mark names with [✘] to strike off suspects. Use the Note Area at the bottom to log contradictions.</li>
+            <li><span class="text-white">Database:</span> Use the Evidence Locker button to search criminal records for hidden motives.</li>
+        </ul>
+    </div>
+
+    <div>
+        <p class="text-cyan-400 font-bold underline uppercase">6. MOBILE UNIT (PHONE ICON)</p>
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+            <li><span class="text-white">SMS:</span> Text the Boss, Forensics, Wife, or Scammer for external intel.</li>
+            <li><span class="text-white">7 Up 7 Down:</span> Gamble for "Restricted Intel." <span class="text-cyan-400">Win:</span> Unlock secrets. <span class="text-red-500">Lose:</span> Waste 20 Minutes.</li>
+        </ul>
+    </div>
+
+    <div>
+        <p class="text-cyan-400 font-bold underline uppercase">7. THE ARREST (TOP RIGHT)</p>
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+            <li><span class="text-white">Issue Warrant:</span> Select the killer and submit your final theory. <span class="text-red-500 font-bold">Caution: You only get one shot.</span></li>
+        </ul>
+    </div>
+
+    <div>
+        <p class="text-cyan-400 font-bold underline uppercase">8. SERVICE RECORD (TOP LEFT)</p>
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+            <li><span class="text-white">Badge Sync:</span> Your career wins/losses are tracked via Google Auth and synced to the PD mainframe.</li>
+        </ul>
+    </div>
+
+    <div class="bg-cyan-900/20 p-3 border border-cyan-500/30 text-[10px] italic mt-4">
+        Note: The SinCity PD mainframe is always watching. Cross-reference all statements with physical evidence before issuing a warrant.
+    </div>
+</div>
+
+        <button onclick="UI.toggleRules()" class="mt-8 w-full py-4 bg-cyan-600 text-white font-black uppercase text-[10px] tracking-widest hover:bg-cyan-400 hover:text-black transition-all">Return to Field</button>
+    </div>
+</div>
 
     <div id="database-modal" class="hidden fixed inset-0 z-[3000] bg-slate-950/90 flex items-center justify-center p-4 md:p-6 backdrop-blur-md">
         <div class="neon-box max-w-2xl w-full p-6 md:p-8 border-cyan-500 border-2">
