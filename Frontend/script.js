@@ -46,6 +46,11 @@ const GameState = {
         if (window.PhoneSystem) {
             window.PhoneSystem.init();
         }
+        //if (window.AudioManager) {
+        AudioManager.init();
+        //AudioManager.playMusic();
+    //}
+    CheatCodes.init();
 
         try {
             const response = await fetch('https://sin-city.onrender.com/api/subjects');
@@ -458,6 +463,117 @@ const GameState = {
     `).join('');
 }
 };
+
+const AudioManager = {
+    init() {
+        const music = document.getElementById('bg-music');
+        const slider = document.getElementById('volume-slider');
+        
+        if (!music || !slider) return;
+
+        const savedVol = localStorage.getItem('sincity_vol') || 0.5;
+        music.volume = savedVol;
+        slider.value = savedVol;
+
+        slider.oninput = (e) => {
+            const val = e.target.value;
+            music.volume = val;
+            localStorage.setItem('sincity_vol', val);
+            
+            // If they move the slider but music was blocked, try starting it
+            if (music.paused && val > 0) this.play();
+        };
+
+        // Important: Try to play immediately
+        this.play();
+    },
+
+    play() {
+        const music = document.getElementById('bg-music');
+        if (!music) return;
+
+        // Force a load and attempt play
+        music.play().then(() => {
+            console.log("🔊 Noir audio active.");
+        }).catch(err => {
+            console.warn("🔇 Autoplay blocked. Will trigger on next click.");
+            
+            // FALLBACK: One-time listener for the first click anywhere
+            const startOnInteraction = () => {
+                music.play();
+                document.removeEventListener('click', startOnInteraction);
+            };
+            document.addEventListener('click', startOnInteraction);
+        });
+    }
+};
+const CheatCodes = {
+    // Hardcoded suspect to be removed
+    TARGET_SUSPECT: "Jax", 
+
+    init() {
+        const input = document.getElementById('cheat-input');
+        if (!input) return;
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const code = input.value.trim().toLowerCase();
+                this.execute(code);
+                input.value = ""; // Clear after attempt
+            }
+        });
+    },
+
+    execute(code) {
+        // CODE 1: Increase Time by 15 mins (MAX 24 HOURS)
+        if (code === "marinatesnow") {
+            const currentTotalSeconds = GameState.time * 60;
+            const fifteenMins = 15 * 60;
+            const maxSeconds = 24 * 60 * 60;
+
+            if (currentTotalSeconds + fifteenMins <= maxSeconds) {
+                GameState.time += 15;
+            } else {
+                GameState.time = 24 * 60; // Cap it at 24 hours
+            }
+            
+            GameState.updateUI();
+            UI.log("OVERRIDE: TEMPORAL MATRIX RECALIBRATED (+15M)", "text-yellow-500 font-bold");
+        }
+
+        // CODE 2: Strike through Jax
+        if (code === "NOPESTS!!") {
+            this.strikeSuspect(this.TARGET_SUSPECT);
+            UI.log(`OVERRIDE: SUBJECT ${this.TARGET_SUSPECT.toUpperCase()} REMOVED FROM SCOPE`, "text-red-500 font-bold");
+        }
+    },
+
+    strikeSuspect(name) {
+    // Get all the suspect divs inside the clipboard grid
+    const grid = document.getElementById('clipboard-grid');
+    if (!grid) return;
+
+    const suspects = grid.querySelectorAll('div');
+    
+    suspects.forEach(el => {
+        // We check if the text matches (ignoring case)
+        if (el.innerText.toUpperCase().includes(name.toUpperCase())) {
+            // Apply your manual toggle class
+            el.classList.add('line-through'); 
+            
+            // Also apply the "Struck Out" CSS for the neon red line effect
+            el.classList.add('struck-out');
+            
+            // Optional: Disable the click so the user can't un-strike him
+            el.style.pointerEvents = 'none';
+        }
+    });
+}};
+
+// Initialize inside GameState.init()
+// CheatCodes.init();
+
+// Trigger this in handleGameStart()
 
 // --- GOOGLE LOGIN HANDLER (OUTSIDE OBJECT) ---
 async function handleGoogleLogin(response) {
