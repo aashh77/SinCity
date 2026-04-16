@@ -180,9 +180,9 @@ app.post('/api/interrogate', async (req, res) => {
         else if (name === "Judge Halloway") {
             systemPrompt += `\n
             MECHANIC: You are hard of hearing. You are a retired well-known judge.
-            - If the user DOES NOT use ALL CAPS, respond only by asking them to speak up.
+            - If the user DOES NOT use ALL CAPS, respond only by asking them to speak louder.
             - Only give a proper reply to the query if the user writes in ALL CAPS.
-            - If asked about Julian(in all CAPS), reply saying he is a good young man. Started working with you a few weeks ago. Has a sharp eye.`;
+            - If asked about Julian(in ALL CAPS), reply saying he is a good young man. Started working with you a few weeks ago. Has a sharp eye.`;
         }
         else if (name === "Arthur Penhaligon") {
             systemPrompt += `\n TRAIT: You have a severe nervous stammer. Type with st-st-stutters.
@@ -276,8 +276,8 @@ app.post('/api/verify-warrant', async (req, res) => {
     }
 });
 
-//const PORT = process.env.PORT || 8080;
-const PORT = 8080
+const PORT = process.env.PORT || 8080;
+// const PORT = 8080
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`>> BACKEND: Online on port ${PORT}`);
 });

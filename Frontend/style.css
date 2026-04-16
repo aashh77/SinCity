@@ -439,3 +439,25 @@ textarea {
 #stats-popup {
     z-index: 100000 !important; /* Higher than the button */
 }
+
+/* This layer sits behind everything and flashes */
+.siren-background-flash {
+    position: fixed;
+    inset: 0;
+    /* High z-index to cover the game UI, but lower than your login box */
+    z-index: 1500; 
+    animation: siren-strobe 0.5s infinite steps(2);
+    /* 0.8 is very intense, 1.0 is total solid color */
+    opacity: 1; 
+    pointer-events: none;
+}
+
+@keyframes siren-strobe {
+    0%, 100% { background-color: #ff0000; } /* Pure Red */
+    100% { background-color: #0303fa; }      /* Pure Blue */
+}
+
+.fade-out {
+    opacity: 0 !important;
+    transition: opacity 1s ease-out;
+}

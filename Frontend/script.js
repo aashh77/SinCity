@@ -40,6 +40,7 @@ const GameState = {
     async init() {
         this.renderMap();
         this.updateUI();
+        stopSirens();
         this.startClock();
         this.renderClipboard();
         this.startTime = Date.now(); 
@@ -48,13 +49,14 @@ const GameState = {
         }
         //if (window.AudioManager) {
         AudioManager.init();
+        
         //AudioManager.playMusic();
     //}
     CheatCodes.init();
     GameState.totalTimeLostGambling=0;
 
         try {
-            const response = await fetch('http://127.0.0.1:8080/api/subjects');
+            const response = await fetch('https://sin-city.onrender.com/api/subjects');
             const subjects = await response.json();
             
             if (subjects && subjects.length > 0) {
@@ -99,18 +101,19 @@ const GameState = {
         }, 1000); 
     },
 
+
     gameOver(type, narrative) {
         if (this.gameClockInterval) clearInterval(this.gameClockInterval);
         document.getElementById('player-input').disabled = true;
 
         const endData = {
             WIN: {
-                header: "CASE_CLOSED",
+                header: "CASE CLOSED",
                 headerClass: "neon-text-green", 
                 image: "https://t4.ftcdn.net/jpg/04/39/31/31/360_F_439313135_MiYN3R98rCRl38t1NFNICJYs7rs55dqH.jpg"
             },
             LOSS: {
-                header: "STATUS_TERMINATED",
+                header: "STATUS TERMINATED",
                 headerClass: "neon-text-red", 
                 image: "https://www.sydneycriminallawyers.com.au/app/uploads/2015/02/prison-escape-night.jpg"
             }
@@ -138,7 +141,7 @@ const GameState = {
         const secondsPlayed = Math.floor((Date.now() - this.startTime) / 1000);
 
         if (this.googleId) {
-            fetch('http://127.0.0.1:8080/api/update-stats', {
+            fetch('https://sin-city.onrender.com/api/update-stats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -176,7 +179,7 @@ const GameState = {
             if (query.includes("sarah") || query.includes("oakhaven") || query.includes("elias")) {
                 display.innerHTML = `
                     <div class="border border-yellow-500/50 p-3 bg-yellow-950/20 rounded mb-2 animate-in fade-in duration-500">
-                        <p class="text-yellow-500 font-bold">[FILE FOUND: OAKHAVEN_2021]</p>
+                        <p class="text-yellow-500 font-bold">[FILE FOUND: OAKHAVEN 2021]</p>
                         <p class="text-white"><span class="text-cyan-500 font-bold">SUBJECT:</span> Sarah [DECEASED]</p>
                         <p class="text-white"><span class="text-cyan-500 font-bold">RECORD:</span> Former associate of the Oakhaven Drug Ring.</p>
                         <p class="text-white"><span class="text-cyan-500 font-bold">INTEL:</span> Provided state evidence against lead chemist. Was granted full immunity <span class="text-red-500 font-bold">'ELIAS'</span>.</p>
@@ -202,7 +205,7 @@ const GameState = {
         UI.log(`TRANSMITTING WARRANT FOR ${target.toUpperCase()}...`, "text-yellow-500 blink");
 
         try {
-            const response = await fetch('http://127.0.0.1:8080/api/verify-warrant', {
+            const response = await fetch('https://sin-city.onrender.com/api/verify-warrant', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ target, theory })
@@ -267,7 +270,7 @@ const GameState = {
         UI.log(`${name.toUpperCase()} IS RESPONDING...`, "text-cyan-900 animate-pulse text-[8px]", thinkingId);
 
         try {
-            const response = await fetch('http://127.0.0.1:8080/api/interrogate', {
+            const response = await fetch('https://sin-city.onrender.com/api/interrogate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, message })
@@ -467,6 +470,15 @@ const GameState = {
     `).join('');
 }
 };
+document.addEventListener('click', function playSirenOnFirstClick() {
+    const audio = document.getElementById('siren-audio');
+    if (audio) {
+        audio.volume = 0.2; 
+        audio.play().catch(e => console.log("Audio waiting for interaction..."));
+    }
+    // This ensures it only runs once
+    document.removeEventListener('click', playSirenOnFirstClick);
+}, { once: true });
 
 const AudioManager = {
     init() {
@@ -581,12 +593,17 @@ const CheatCodes = {
 
 // --- GOOGLE LOGIN HANDLER (OUTSIDE OBJECT) ---
 async function handleGoogleLogin(response) {
-    
+    stopSirens();
+
     const base64Url = response.credential.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const payload = JSON.parse(window.atob(base64));
 
-    const res = await fetch('http://127.0.0.1:8080/api/user-sync', {
+    // Optional: Update the detective name on the UI using the Google payload
+    const detName = document.getElementById('detective-name');
+    if (detName) detName.innerText = `DET. ${payload.given_name.toUpperCase()}`;
+
+    const res = await fetch('https://sin-city.onrender.com/api/user-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -596,6 +613,17 @@ async function handleGoogleLogin(response) {
             avatar: payload.picture
         })
     });
+    // 1. STOP THE SIRENS IMMEDIATELY
+    const siren = document.querySelector('.siren-background-flash');
+    if (siren) {
+        siren.remove(); 
+    }
+
+    // 2. ALSO HIDE THE SIREN OVERLAY (if you have one)
+    const overlay = document.querySelector('.siren-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
 
     const user = await res.json();
     document.getElementById('stat-name').innerText = user.displayName;
@@ -830,7 +858,7 @@ const PhoneSystem = {
     },
 
     finishGame(choice, d1, d2, status, btns) {
-        const win = Math.random() < 0.20;
+        const win = Math.random() < 0.05;
         let r1, r2;
         
         if (win) {
@@ -897,7 +925,7 @@ const PhoneSystem = {
         this.renderMessages();
         input.value = "";
         try {
-            const res = await fetch('http://127.0.0.1:8080/api/chat', {
+            const res = await fetch('https://sin-city.onrender.com/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: this.contacts[this.activeContactKey].name, message: text })
@@ -942,7 +970,7 @@ function handleSpinClick() {
     currentSpins--;
     document.getElementById('spin-count').innerText = currentSpins;
 
-    const forceWin = Math.random() < 0.6; // 60% chance
+    const forceWin = Math.random() < 0.35; // 60% chance
     let results = forceWin ? 
         Array(3).fill(icons[Math.floor(Math.random() * icons.length)]) : 
         [icons[0], icons[Math.floor(Math.random() * (icons.length-1)) + 1], icons[1]]; // Ensure variety for loss
@@ -1000,15 +1028,57 @@ const GhostStats = {
             };
 
             const distance = Math.hypot(e.clientX - btnCenter.x, e.clientY - btnCenter.y);
-            if (distance < 50) this.teleport(); // Increased distance to 100 for better "run away"
+            if (distance < 20) this.teleport(); // Increased distance to 100 for better "run away"
         });
 
         this.btn.onclick = () => {
-            this.active = false;
-            this.btn.style.display = "none";
-            document.getElementById('popup-time-lost').innerText = `${GameState.totalTimeLostGambling || 0} MINS`;
-            document.getElementById('stats-popup').classList.remove('hidden');
-        };
+    this.active = false;
+    this.btn.style.display = "none";
+    
+    const timeLost = GameState.totalTimeLostGambling || 0;
+    const popup = document.getElementById('stats-popup');
+    const container = popup.querySelector('.max-w-sm');
+    const header = document.getElementById('audit-header');
+    const timeDisplay = document.getElementById('popup-time-lost');
+    const auditBody = document.getElementById('audit-content');
+
+    if (timeLost > 40) {
+        // --- GAMBLER WARNING STATE ---
+        header.innerText = "SESSION AUDIT: WARNING";
+        header.className = "font-['Syncopate'] text-pink-500 text-sm mb-6 tracking-widest text-center";
+        container.style.borderColor = "#ec4899"; // Pink
+        timeDisplay.innerText = `${timeLost} MINS`;
+        
+        auditBody.innerHTML = `
+            <div class="border-t border-pink-900/50 pt-4 mt-4">
+                <p class="text-[10px] text-red-500 font-black leading-relaxed text-center uppercase">
+                    Warning: Gambling behavior detected. Efficiency compromised.
+                </p>
+                <p class="mt-6 text-center">
+                    <span class="text-pink-400 block mb-2">GET HELP BRO!</span>
+                    <a href="tel:18005224700" class="text-white underline font-bold text-base">1-800-522-4700</a>
+                </p>
+            </div>`;
+    } else {
+        // --- EFFICIENCY PRAISE STATE ---
+        header.innerText = "SESSION AUDIT: EXEMPLARY";
+        header.className = "font-['Syncopate'] text-cyan-400 text-sm mb-6 tracking-widest text-center";
+        container.style.borderColor = "#22d3ee"; // Cyan
+        timeDisplay.innerText = "0 MINS (OPTIMAL)";
+
+        auditBody.innerHTML = `
+            <div class="border-t border-cyan-900/50 pt-4 mt-4 text-center">
+                <p class="text-[10px] text-cyan-400 font-black leading-relaxed uppercase">
+                    Performance Status: Professional
+                </p>
+                <p class="mt-4 text-white/80 italic">
+                    "Maximum focus. Minimum waste. You're a credit to the Sin City PD."
+                </p>
+            </div>`;
+    }
+
+    popup.classList.remove('hidden');
+};
     },
 
     teleport() {
@@ -1075,3 +1145,32 @@ function handleFinalLoss() {
 }
 
 window.handleSpinClick = handleSpinClick;
+
+function stopSirens() {
+    const siren = document.querySelector('.siren-background-flash');
+    const overlay = document.querySelector('.siren-overlay');
+    
+    if (siren && !siren.classList.contains('fade-out')) {
+        siren.classList.add('fade-out');
+        // Remove it from the DOM entirely after the 1s fade finishes
+        setTimeout(() => siren.remove(), 1000); 
+    }
+    
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+
+    const audio = document.getElementById('siren-audio');
+    if (audio) {
+        // Smoothly lowers the volume before pausing
+        let fadeOut = setInterval(() => {
+            if (audio.volume > 0.02) {
+                audio.volume -= 0.02;
+            } else {
+                audio.pause();
+                clearInterval(fadeOut);
+            }
+        }, 30);
+    }
+}
+
