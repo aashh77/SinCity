@@ -427,3 +427,15 @@ textarea {
     box-shadow: 0 0 8px #ff003c;
     transform: rotate(-1deg);
 }
+
+#ghost-stats-btn {
+    position: fixed !important; /* Overrides any other positioning */
+    z-index: 99999 !important;  /* Must be higher than #end-screen's 5000 */
+    display: none;              /* Hidden until GhostStats.start() runs */
+    pointer-events: auto;       /* Ensures it can be clicked */
+    background-color: rgba(15, 23, 42, 0.9); /* Dark slate background so text is readable */
+}
+
+#stats-popup {
+    z-index: 100000 !important; /* Higher than the button */
+}

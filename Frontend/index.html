@@ -181,50 +181,95 @@
         <div class="space-y-4 font-mono text-xs text-cyan-100/90 leading-relaxed max-h-[60vh] overflow-y-auto custom-scrollbar pr-2 text-left">
     
     <div>
-        <p class="text-cyan-400 font-bold underline uppercase">1. SUBJECTS & DOSSIERS (LEFT)</p>
+
+        <p class="text-cyan-400 font-bold underline uppercase">1. SUSPECTS (LEFT)</p>
+
         <ul class="list-disc pl-5 mt-1 space-y-1">
-            <li><span class="text-white">Hover Names:</span> Reveals subject history and alibis.</li>
-            <li><span class="text-white">Patience:</span> Interrogating costs blue segments. If empty, the subject remains silent.</li>
+
+            <li><span class="text-white">Hover:</span> See history and alibis.</li>
+
+            <li><span class="text-white">Patience:</span> Questioning costs patience(blue segments). If empty, they stop talking.</li>
+
         </ul>
+
     </div>
 
-    <div>
-        <p class="text-cyan-400 font-bold underline uppercase">2. TACTICAL OVERLAY (MAP)</p>
-        <ul class="list-disc pl-5 mt-1 space-y-1">
-            <li><span class="text-white">Movement:</span> Click a room to relocate.</li>
-            <li><span class="text-white">Cost:</span> Every move consumes 15 Minutes of investigation time.</li>
-        </ul>
-    </div>
+
 
     <div>
-        <p class="text-cyan-400 font-bold underline uppercase">3. FIELD INVESTIGATION (TERMINAL)</p>
+
+        <p class="text-cyan-400 font-bold underline uppercase">2. MAP</p>
+
         <ul class="list-disc pl-5 mt-1 space-y-1">
-            <li><span class="text-white">Command:</span> Type "search" in the chatbox to uncover hidden physical evidence in your current room.</li>
-            <li><span class="text-white">Evidence:</span> Click a found item in your locker to print its description and incriminating details.</li>
+
+            <li><span class="text-white">Travel:</span> Click a room to move.</li>
+
+            <li><span class="text-white">Time:</span> Each move takes 15 minutes of game time.</li>
+
         </ul>
+
     </div>
 
-    <div>
-        <p class="text-cyan-400 font-bold underline uppercase">4. CONFRONTATION</p>
-        <ul class="list-disc pl-5 mt-1 space-y-1">
-            <li><span class="text-white">The Loop:</span> To show proof, Click Subject Card first to focus them, then Click Evidence Tile to force a response.</li>
-        </ul>
-    </div>
+
 
     <div>
-        <p class="text-cyan-400 font-bold underline uppercase">5. DETECTIVE’S TOOLS</p>
+
+        <p class="text-cyan-400 font-bold underline uppercase">3. SEARCHING (TERMINAL)</p>
+
         <ul class="list-disc pl-5 mt-1 space-y-1">
-            <li><span class="text-white">Clipboard:</span> Mark names with [✘] to strike off suspects. Use the Note Area at the bottom to log contradictions.</li>
-            <li><span class="text-white">Database:</span> Use the Evidence Locker button to search criminal records for hidden motives.</li>
+
+            <li><span class="text-white">Command:</span> Type "search" to find clues in your current room.</li>
+
+            <li><span class="text-white">Locker:</span> Click the newly found clues in your locker to read their details.</li>
+
         </ul>
+
     </div>
 
+
+
     <div>
-        <p class="text-cyan-400 font-bold underline uppercase">6. MOBILE UNIT (PHONE ICON)</p>
+
+        <p class="text-cyan-400 font-bold underline uppercase">4. INTERROGATION</p>
+
         <ul class="list-disc pl-5 mt-1 space-y-1">
-            <li><span class="text-white">SMS:</span> Text the Boss, Forensics, Wife, or Scammer for external intel.</li>
-            <li><span class="text-white">7 Up 7 Down:</span> Gamble for "Restricted Intel." <span class="text-cyan-400">Win:</span> Unlock secrets. <span class="text-red-500">Lose:</span> Waste 20 Minutes.</li>
+
+            <li><span class="text-white">Proof:</span> Click a Subject Card, then click an Evidence Tile to force a response.</li>
+
         </ul>
+
+    </div>
+
+
+
+    <div>
+
+        <p class="text-cyan-400 font-bold underline uppercase">5. TOOLS</p>
+
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+
+            <li><span class="text-white">Clipboard:</span> Use [✘] to rule out suspects and log notes at the bottom.</li>
+
+            <li><span class="text-white">Database:</span> Check the Evidence Locker for criminal records and motives.</li>
+
+        </ul>
+
+    </div>
+
+
+
+    <div>
+
+        <p class="text-cyan-400 font-bold underline uppercase">6. PHONE ICON</p>
+
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+
+            <li><span class="text-white">SMS:</span> Text contacts for fun.</li>
+
+            <li><span class="text-white">Gamble:</span> Play 7 Up 7 Down for secrets. <span class="text-red-500">Loss:</span> Wastes 20 minutes.</li>
+
+        </ul>
+
     </div>
 
     <div>
@@ -284,7 +329,7 @@
                 const user = result.user;
 
                 // 1. Sync user data with MongoDB Backend
-                const syncResponse = await fetch('https://sin-city.onrender.com/api/user-sync', {
+                const syncResponse = await fetch('http://127.0.0.1:8080/api/user-sync', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -391,6 +436,36 @@
     <input type="text" id="cheat-input" placeholder="ACCESS CODE..." 
            class="bg-slate-900 border border-cyan-500/50 p-2 text-[10px] text-cyan-400 outline-none w-48 text-center rounded">
 </div>
+<button id="ghost-stats-btn" 
+    style="position: fixed; top: 50%; left: 50%; z-index: 99999;"
+    class="px-4 py-2 bg-slate-900 border-2 border-pink-500 text-pink-500 font-black text-[10px] uppercase tracking-widest hidden transition-all duration-300 hover:bg-pink-500 hover:text-black shadow-[0_0_20px_#ff00ff]">
+    [!] FUN STATS
+</button>
 
+<div id="stats-popup" class="hidden fixed inset-0 z-[10000] bg-black/95 flex items-center justify-center p-4 backdrop-blur-xl">
+    <div class="max-w-sm w-full p-8 border-2 border-pink-500 bg-slate-950 relative shadow-[0_0_30px_rgba(255,0,255,0.2)]">
+        <div class="absolute -top-1 left-0 w-full h-1 bg-pink-500 shadow-[0_0_15px_#ff00ff]"></div>
+        <h2 class="font-['Syncopate'] text-pink-500 text-sm mb-6 tracking-widest text-center">SESSION_AUDIT</h2>
+        
+        <div class="space-y-4 font-mono text-xs text-pink-200/80">
+            <p class="flex justify-between"><span>TOTAL_TIME_WASTED:</span> <span id="popup-time-lost">0 MINS</span></p>
+            <div class="border-t border-pink-900/50 pt-4 mt-4">
+                <p class="text-[10px] text-red-500 font-black leading-relaxed text-center uppercase">
+                    Warning: Gambling behavior detected during investigation. 
+                    Efficiency compromised.
+                </p>
+                <p class="mt-6 text-center">
+                    <span class="text-pink-400 block mb-2">GET HELP:</span>
+                    <a href="tel:18005224700" class="text-white underline font-bold text-base">1-800-522-4700</a>
+                </p>
+            </div>
+        </div>
+        
+        <button onclick="document.getElementById('stats-popup').classList.add('hidden')" 
+            class="mt-8 w-full py-2 border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-black transition-all font-black text-[10px]">
+            CLOSE_LOG
+        </button>
+    </div>
+</div>
 </body>
 </html>

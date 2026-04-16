@@ -153,7 +153,8 @@ app.post('/api/interrogate', async (req, res) => {
             -Sarah(the PA) and the VIP are killed.
             - Julian is Elias (The Chemist).
             - He used a toxin/syringe. 
-            - No one knows of his past as a chemist and that he had once known Sarah. Sarah had put him away to prison a few years ago and run away. He despises her for it. `;
+            - No one knows of his past as a chemist and that he had once known Sarah. Sarah had put him away to prison a few years ago and run away. He despises her for it. 
+            -The CCTVs were turned off during the crime. They were manually turned off.`;
 
         // 2. Character-Specific Logic (The "If/Else" Block)
         if (name === "Julian Vane") {
@@ -275,8 +276,8 @@ app.post('/api/verify-warrant', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 8080;
-//const PORT = 8080
+//const PORT = process.env.PORT || 8080;
+const PORT = 8080
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`>> BACKEND: Online on port ${PORT}`);
 });

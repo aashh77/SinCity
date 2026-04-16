@@ -51,9 +51,10 @@ const GameState = {
         //AudioManager.playMusic();
     //}
     CheatCodes.init();
+    GameState.totalTimeLostGambling=0;
 
         try {
-            const response = await fetch('https://sin-city.onrender.com/api/subjects');
+            const response = await fetch('http://127.0.0.1:8080/api/subjects');
             const subjects = await response.json();
             
             if (subjects && subjects.length > 0) {
@@ -125,16 +126,19 @@ const GameState = {
             header.className = data.headerClass;
             img.src = data.image;
             screen.classList.remove('hidden');
+            GhostStats.start();
             setTimeout(() => {
                 UI.typeLogNarrative("end-ai-feedback", narrative);
             }, 1500);
         }
+            
+
 
 
         const secondsPlayed = Math.floor((Date.now() - this.startTime) / 1000);
 
         if (this.googleId) {
-            fetch('https://sin-city.onrender.com/api/update-stats', {
+            fetch('http://127.0.0.1:8080/api/update-stats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -198,7 +202,7 @@ const GameState = {
         UI.log(`TRANSMITTING WARRANT FOR ${target.toUpperCase()}...`, "text-yellow-500 blink");
 
         try {
-            const response = await fetch('https://sin-city.onrender.com/api/verify-warrant', {
+            const response = await fetch('http://127.0.0.1:8080/api/verify-warrant', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ target, theory })
@@ -263,7 +267,7 @@ const GameState = {
         UI.log(`${name.toUpperCase()} IS RESPONDING...`, "text-cyan-900 animate-pulse text-[8px]", thinkingId);
 
         try {
-            const response = await fetch('https://sin-city.onrender.com/api/interrogate', {
+            const response = await fetch('http://127.0.0.1:8080/api/interrogate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, message })
@@ -582,7 +586,7 @@ async function handleGoogleLogin(response) {
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const payload = JSON.parse(window.atob(base64));
 
-    const res = await fetch('https://sin-city.onrender.com/api/user-sync', {
+    const res = await fetch('http://127.0.0.1:8080/api/user-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -826,7 +830,7 @@ const PhoneSystem = {
     },
 
     finishGame(choice, d1, d2, status, btns) {
-        const win = Math.random() < 0.30;
+        const win = Math.random() < 0.20;
         let r1, r2;
         
         if (win) {
@@ -850,6 +854,7 @@ const PhoneSystem = {
             
             // --- 3. Increased Penalty to 20 mins ---
             GameState.time -= 20; 
+            GameState.totalTimeLostGambling = (GameState.totalTimeLostGambling || 0) + 20;
             GameState.updateUI();
             
             status.innerHTML = `<span class="text-red-500 uppercase">LOST. -20 MINS</span>`;
@@ -892,7 +897,7 @@ const PhoneSystem = {
         this.renderMessages();
         input.value = "";
         try {
-            const res = await fetch('https://sin-city.onrender.com/api/chat', {
+            const res = await fetch('http://127.0.0.1:8080/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: this.contacts[this.activeContactKey].name, message: text })
@@ -971,11 +976,54 @@ function handleSpinClick() {
         }, 1000 + (i * 400));
     });
 }
+const GhostStats = {
+    btn: document.getElementById('ghost-stats-btn'),
+    active: false,
+    
+    start() {
+        if (!this.btn) {
+            this.btn = document.getElementById('ghost-stats-btn'); // Double check selection
+        }
+        
+        console.log("Ghost Button Activated");
+        this.active = true;
+        this.btn.style.display = "block"; // Force visibility
+        this.btn.classList.remove('hidden');
+        this.teleport();
+
+        document.addEventListener('mousemove', (e) => {
+            if(!this.active) return;
+            const btnRect = this.btn.getBoundingClientRect();
+            const btnCenter = {
+                x: btnRect.left + btnRect.width / 2,
+                y: btnRect.top + btnRect.height / 2
+            };
+
+            const distance = Math.hypot(e.clientX - btnCenter.x, e.clientY - btnCenter.y);
+            if (distance < 50) this.teleport(); // Increased distance to 100 for better "run away"
+        });
+
+        this.btn.onclick = () => {
+            this.active = false;
+            this.btn.style.display = "none";
+            document.getElementById('popup-time-lost').innerText = `${GameState.totalTimeLostGambling || 0} MINS`;
+            document.getElementById('stats-popup').classList.remove('hidden');
+        };
+    },
+
+    teleport() {
+        // Keeps the button within the visible viewport
+        const x = Math.random() * (window.innerWidth - 150);
+        const y = Math.random() * (window.innerHeight - 50);
+        this.btn.style.left = `${x}px`;
+        this.btn.style.top = `${y}px`;
+    }
+};
 
 function triggerJackpot() {
     setTimeout(() => {
         const colors = ['#00f3ff', '#ff00ff', '#00ff00', '#ffff00', '#ff003c'];
-        const particleCount = 500;
+        const particleCount = 700;
 
         for (let i = 0; i < particleCount; i++) {
             const confetti = document.createElement('div');
